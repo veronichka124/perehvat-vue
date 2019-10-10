@@ -1,0 +1,189 @@
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 0px;
+}
+
+.container {
+  padding: 0;
+}
+
+body {
+  display: flex;
+  margin: 0;
+}
+
+nav {
+  display: flex;
+  position: absolute;
+  z-index: 1;
+  background: #858585;
+  color: #fff;
+  flex-direction: column;
+}
+
+.material-icons {
+  font-size: 30px;
+}
+
+.current {
+  background: #dddddd;
+}
+
+#toolbar {
+  padding: 0;
+}
+
+.back-btn {
+  margin: 0;
+}
+
+i {
+  cursor: pointer;
+  
+}
+
+h1, h2 {
+  font-weight: normal;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  top: 60px;
+  width: 100%;
+}
+
+li {
+  display: table;
+  margin: 0 10px;
+  padding: 5px 0;
+  cursor: pointer;
+  height: 2em;
+  list-style-type: none;
+  text-transform: capitalize;
+  transition: all .3s ease;
+}
+
+a {
+  color: #42b983;
+}
+
+button {
+  z-index: 1;
+}
+
+div.game_on #timer_on {
+  background-color: green;
+  margin-bottom: 0px;
+  color: white;
+}
+
+div.game_waiting #timer_on {
+  background-color: red;
+  margin-bottom: 0px;
+  color: white;
+}
+
+.info-box {
+  text-align: center;
+  color: black;
+}
+
+.info-box-title {
+  font-size: 16px;
+  text-align: center;
+}
+
+.btn-round {
+  border-radius: 10px;
+}
+
+.drawer {
+  background: #eeeeee;
+}
+
+.icon-width {
+  width: 40px;
+  text-align: center;
+  color: #26a69a;
+}
+
+.icon-admin {
+  color: #e60000;
+}
+
+.warning {
+  color: red;
+}
+
+.btn-red {
+  background: #e60000;
+}
+
+.subheader {
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+#newGameBtn, #stopGameBtn {
+  width: 90%;
+  margin: 10px auto;
+}
+
+#stopGameBtn {
+  background: #e60000;
+}
+
+#gps_error {
+  font-weight: bold;
+  color: red;
+}
+
+.hunter-is-close {
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  z-index: 1;
+  background-color: transparent;
+  background-image: url(assets/siren.jpg);
+  background-size: contain;
+  border-radius: 50%;
+  top: 6px;
+  right: 5px;
+  box-shadow: 0 0 0 rgba(204,63,204, 0.4);
+  animation: pulse 1s infinite;
+}
+
+@-webkit-keyframes pulse {
+  0% {
+    -webkit-box-shadow: 0 0 0 0 rgba(0, 7, 255, 0.4);
+  }
+  70% {
+      -webkit-box-shadow: 0 0 0 200px rgba(0, 7, 255, 0);
+  }
+  100% {
+      -webkit-box-shadow: 0 0 0 0 rgba(0, 7, 255, 0);
+  }
+}
+@keyframes pulse {
+  0% {
+    -moz-box-shadow: 0 0 0 0 rgba(0, 7, 255, 0.4);
+    box-shadow: 0 0 0 0 rgba(0, 7, 255, 0.4);
+  }
+  70% {
+      -moz-box-shadow: 0 0 0 200px rgba(0, 7, 255, 0);
+      box-shadow: 0 0 0 200px rgba(0, 7, 255, 0);
+  }
+  100% {
+      -moz-box-shadow: 0 0 0 0 rgba(0, 7, 255, 0);
+      box-shadow: 0 0 0 0 rgba(0, 7, 255, 0);
+  }
+}
+
