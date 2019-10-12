@@ -58,7 +58,7 @@
           Game does not exist
         </v-alert>
         <!-- on click change game to new game name -->
-        <v-btn round color="primary" dark @click="joinGame(newGame)">Join game</v-btn>        
+        <v-btn round color="primary" dark  @click="joinGame(newGame)">Join game</v-btn>        
       </div>
     </modal>
     <!-- Change name screen -->
@@ -74,7 +74,7 @@
               ></v-text-field>
         </v-flex>
         <!-- on click change name to new -->
-        <v-btn round color="primary" dark @click="changeName">Save</v-btn>        
+        <v-btn round color="primary" dark  @click="changeName">Save</v-btn>        
       </div>
     </modal>
     <!-- END MODAL -->  
@@ -416,6 +416,7 @@ export default {
   name: 'app',  
   data () {    
     return {
+      axiosstop: false,
       car: "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z",
       colors: [
         {name: 'Black', value: '#404040', text: '#ff8000'},
@@ -649,6 +650,22 @@ export default {
     //   document.removeEventListener('click', enableNoSleep, false);
     //   noSleep.enable();
     // }, false);
+
+    // hack for IOS 13    
+    if (/iP(hone|od|ad)/.test(navigator.platform)) {
+        var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);        
+        v = [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+        if (v[0] >= 13) {
+          document.addEventListener("pointerdown", e => {
+            this.axiosstop = true;
+            setTimeout(function() {this.axiosstop = false}.bind(this), 1000);
+          });
+
+          document.addEventListener("click", e => {
+            this.axiosstop = false;      
+          });      
+        }
+    }
 
     if(navigator.geolocation){
        navigator.geolocation.getCurrentPosition(position => {
@@ -925,6 +942,7 @@ export default {
       //get prey info
     },
     game_admins: function(response) {
+      if (this.axiosstop) return; //FIXME: hack for ios13
       //all admins
       this.admins = response.data;
       //am I admin?
@@ -1038,7 +1056,8 @@ export default {
       console.warn('ERROR(' + err.code + '): ' + err.message);
       this.geolocation_error = true;
     },
-    get_markers: function(response) {    
+    get_markers: function(response) {
+      if (this.axiosstop) return; //FIXME: hack for ios13
       // console.log(this.markers);
       var now_time = new Date().getTime()/1000;
       var default_color = 0;
@@ -1075,7 +1094,7 @@ export default {
              location_change == true) {
               heading = this.google.maps.geometry.spherical.computeHeading(
               new this.google.maps.LatLng(this.markers[key].geolocation_lat, this.markers[key].geolocation_lng), 
-              new this.google.maps.LatLng(value.geolocation_lat, value.geolocation_lng));              
+              new this.google.maps.LatLng(value.geolocation_lat, value.geolocation_lng));
           }
         }
         value.color = parseInt(value.color);
@@ -1217,6 +1236,7 @@ export default {
       });       
     },
     get_game_settings: function(response) {
+      if (this.axiosstop) return; //FIXME: hack for ios13
       // console.log(response);
       this.game_settings = response.data;
       var remaining_time = 0;
@@ -1273,6 +1293,7 @@ export default {
       }.bind(this), 1000);
     },
     closed_districts: function(response) {
+      if (this.axiosstop) return; //FIXME: hack for ios13      
       //Update districts checkboxes in menu
       this.checked_districts = [];
       (response.data).forEach(function(value, key) {
