@@ -2,7 +2,7 @@
   <div id="app">   
     <!-- MODAL -->
     <!-- Start  screen -->
-    <modal id="startScreen" v-if="showStartScreen" @close="dialog=showStartScreen = false; screenLock()" >    
+    <modal id="startScreen" v-if="showStartScreen && !geolocation_error" @close="dialog=showStartScreen = false; screenLock()" >    
       <h3 slot="header">Welcome!</h3>
       <div slot="body" class="text-xs-center">
         <!-- on click showCreateGameScreen=true -->
@@ -77,13 +77,23 @@
         <v-btn round color="primary" dark  @click="changeName">Save</v-btn>        
       </div>
     </modal>
+    <!-- GPS Error -->
+     <modal id="gpsError" v-if="geolocation_error">
+        <h3 slot="header" class="gps_error">GPS ERROR</h3>
+        <div slot="body" class="gps_error">
+          <span>1) Включите GPS <br> 
+                2) Настройте GPS для браузера в настройках телефона. <br> 
+                3) Разрешите браузеру использовать геолокацию для этого сайта. <br> 
+                4) Обновите страницу
+          </span>      
+        </div>
+      </modal>
     <!-- END MODAL -->  
     <v-ons-page>
       <div class="hunter-is-close" v-show="ios_alarm"></div>
     <!-- TIMER -->
     <div v-bind:class="{ game_on: game_inprogress, game_waiting: game_waiting}" id="timer">
       <timer ref="game_timer"></timer>  
-      <span id="gps_error" v-if="geolocation_error">GPS ERROR</span>  
     </div>
     
 
@@ -182,15 +192,15 @@
 
         <!-- USERS MENU VIEW --> 
         <div id="usersMenuView" v-if="usersMenuView"> 
-          <v-ons-list-header> Game users </v-ons-list-header>         
+          <v-ons-list-header> Game users ({{Object.keys(markers).length}}) </v-ons-list-header>         
           <v-ons-list v-for="(marker, index) in markers" :key="index">   
             <v-ons-list-item tappable modifier="chevron longdivider" @click="userSettings(marker)">
-              <div class="left">{{marker.user_name}}</div>            
+              <div class="left">{{marker.user_name}} (id: {{marker.id.substr(0,4)}})</div>            
             </v-ons-list-item> 
           </v-ons-list>
           
           <div v-if="am_i_admin">
-            <v-ons-list-header> Unconfirmed users in this game </v-ons-list-header>
+            <v-ons-list-header> Unconfirmed users in this game ({{Object.keys(blocked_users).length}}) </v-ons-list-header>
             <v-ons-list>    
               <v-ons-list-item tappable modifier="chevron" @click="mainMenu('Blocked users')"> 
                <div class="left">Unconfirmed users</div>                        
@@ -201,11 +211,11 @@
 
         <!-- BLOCKED USERS MENU VIEW --> 
         <div id="blockedUsersView" v-if="blockedUsersView"> 
-          <v-ons-list-header> Unconfirmed users in this game </v-ons-list-header>
+          <v-ons-list-header> Unconfirmed users in this game ({{Object.keys(blocked_users).length}})</v-ons-list-header>
           <v-ons-list v-for="(user, index) in blocked_users"  :key="index">               
             <v-ons-list-item modifier="longdivider" tappable @click="dialog=blockedActionSheet=true,user_to_unblock=user"> 
               <div class="center">
-                {{user.user_name}}
+                {{user.user_name}} (id: {{user.id.substr(0,4)}})
               </div>
 
               <v-ons-alert-dialog modifier="rowfooter"
@@ -370,8 +380,9 @@
             }
           }"      
         >
-        <div class="info-box"">
+        <div class="info-box">
           <span class="info-box-title">{{marker.user_name}}</span> <br>
+          <span v-if="am_i_admin" class="info-box-suntitle">(id: {{marker.id.substr(0,4)}})<br></span> 
           <span class="info-box-subtitle">{{marker.speed}} km/h</span> <br>
           <span class="info-box-subtitle">{{marker.last_activity}} ago</span>
         </div>
@@ -417,7 +428,7 @@ export default {
   data () {    
     return {
       axiosstop: false,
-      car: "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z",
+      car: "M17.402,0H5.643C2.526,0,0,3.467,0,6.584v34.804c0,3.116,2.526,5.644,5.643,5.644h11.759c3.116,0,5.644-2.527,5.644-5.644 V6.584C23.044,3.467,20.518,0,17.402,0z M22.057,14.188v11.665l-2.729,0.351v-4.806L22.057,14.188z M20.625,10.773 c-1.016,3.9-2.219,8.51-2.219,8.51H4.638l-2.222-8.51C2.417,10.773,11.3,7.755,20.625,10.773z M3.748,21.713v4.492l-2.73-0.349 V14.502L3.748,21.713z M1.018,37.938V27.579l2.73,0.343v8.196L1.018,37.938z M2.575,40.882l2.218-3.336h13.771l2.219,3.336H2.575z M19.328,35.805v-7.872l2.729-0.355v10.048L19.328,35.805z",	  
       colors: [
         {name: 'Black', value: '#404040', text: '#ff8000'},
         {name: 'Pink', value: '#DB7093', text: '#ff00fb'},
@@ -429,6 +440,8 @@ export default {
         {name: 'Grey', value: '#6B7367', text: '#404040'},
         {name: 'Brown', value: '#7A4630', text: '#ff8000'},
         {name: 'Purple', value: '#9F2E83', text: '#ff00fb'},
+        {name: 'Deep Purple', value: '#835278', text: '#ff00fb'},
+        {name: 'Light Brown', value: '#937777', text: '#404040'},
       ],
       marker_color: 0,
       polygons: [],
@@ -764,12 +777,12 @@ export default {
     }
     if (localStorage.key_id) {      
       this.key = localStorage.key_id;
-      console.log(localStorage.key_id);
+      // console.log(localStorage.key_id);
     } else {      
       localStorage.key_id = this.uuidv4();
       localStorage.password = this.uuidv4();
-      console.log('id: '+localStorage.key_id);
-      console.log('password: '+localStorage.key_id);
+      // console.log('id: '+localStorage.key_id);
+      // console.log('password: '+localStorage.key_id);
       this.key = localStorage.key_id;
     }
     
@@ -820,7 +833,7 @@ export default {
         this.axios
         .post(this.server_url + "new_game.php", bodyFormData)
         .then(function(response) {
-          console.log(response);
+          // console.log(response);
           if (response.data == true) {
             //join game
             this.joinGame(this.newGame);
@@ -852,7 +865,7 @@ export default {
                 }
               })
           .then(function(response) {
-            console.log(response.data);
+            // console.log(response.data);
             if (response.data == false) {
               //game does not exist
               this.gameExists = true;
@@ -883,8 +896,8 @@ export default {
         }         
     },   
     mainMenu: function(current) {
-      console.log('current: '+current);
-      console.log('back: '+this.step_back);
+      // console.log('current: '+current);
+      // console.log('back: '+this.step_back);
       //toolbar header
       this.current_menu = current;
       //close all views
@@ -904,40 +917,42 @@ export default {
       } else if (current == 'Users') {
         this.usersMenuView = true;
         this.step_back = 'Main';
+        this.fetch_blocked_users();
       } else if (current == 'Blocked users') {
         this.blockedUsersView = true;
-        this.step_back = 'Users';
-        //get blocked users
-        this.axios
-        .get(this.server_url + 'blocked_users.php', {
-              params: {
-                game: this.game,
-                password: localStorage.password,
-                id: localStorage.key_id
-              }
-            })
-        .then(this.users_in_block)
-        .catch(function (error) {
-          // handle error
-          console.log(error);
-        })
-        .then(function () {
-          // always executed
-        });  
+        this.step_back = 'Users';        
       } else if (current == 'Game settings') {
         this.gameSettingsView = true;
         this.step_back = 'Main';
       }     
+    },
+    fetch_blocked_users: function() {
+      this.axios
+      .get(this.server_url + 'blocked_users.php', {
+            params: {
+              game: this.game,
+              password: localStorage.password,
+              id: localStorage.key_id
+            }
+          })
+      .then(this.users_in_block)
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      }); 
     },
     users_in_block: function(response) {
       this.blocked_users = [];
       response.data.forEach(function(value, key) {
         this.blocked_users.push(value);
       }.bind(this));
-      console.log(this.blocked_users);
+      // console.log(this.blocked_users);
     },
     unblock_user: function(user) {
-      console.log(user);
+      // console.log(user);
       // this.blockedActionSheet = true;
       var bodyFormData = new FormData();
       bodyFormData.set('user_id', user.id);
@@ -947,7 +962,7 @@ export default {
       this.axios
       .post(this.server_url + "unblock_user.php", bodyFormData)
       .then(function(response) {
-        console.log(response);
+        this.mainMenu("Users");
       }.bind(this))
       .catch(function (error) {
         // handle error
@@ -970,8 +985,8 @@ export default {
       }
     },
     preyChange: function(marker) {
-      console.log(marker);
-      console.log(this.prey_switch);
+      // console.log(marker);
+      // console.log(this.prey_switch);
       var is_prey = false;
       if (this.prey_switch.includes(marker.id)) { 
         is_prey = false; 
@@ -1000,7 +1015,7 @@ export default {
       //get prey info
     },
     set_admin: function(marker) {
-      console.log(this.admin_switch);
+      // console.log(this.admin_switch);
       var admin_checked = false;
       if (this.admin_switch.includes(marker.id)) { 
         admin_checked = false; 
@@ -1017,7 +1032,7 @@ export default {
       this.axios
       .post(this.server_url + "set_admin.php", bodyFormData)
       .then(function(response) {
-        console.log(response);
+        // console.log(response);
       })
       .catch(function (error) {
         // handle error
@@ -1091,7 +1106,7 @@ export default {
       localStorage.color = this.marker_color;
       this.pos = pos;
       var crd = pos.coords;        
-      console.log(crd);
+      // console.log(crd);
       var speed = crd.speed * 3.6;
       var bodyFormData = new FormData();
       bodyFormData.set('id', this.key);
@@ -1118,7 +1133,7 @@ export default {
     },
     changeName: function() {
       localStorage.name = this.newName;
-      console.log(localStorage.name);
+      // console.log(localStorage.name);
       this.name = localStorage.name;
       var bodyFormData = new FormData();
       bodyFormData.set('id', this.key);
@@ -1140,12 +1155,10 @@ export default {
       this.dialog = false;
     },
     geo_error: function(err) {
-      console.warn('ERROR(' + err.code + '): ' + err.message);
       this.geolocation_error = true;
     },
     get_markers: function(response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
-      // console.log(this.markers);
       var now_time = new Date().getTime()/1000;
       var default_color = 0;
       var role = false;
@@ -1248,9 +1261,7 @@ export default {
       }.bind(this), 300);
     },
     alarm: function(response) {
-      console.log(response.data);        
       if (response.data == true) {
-        console.log("ALARM");
         this.alarm_audio.play();
         this.ios_alarm = true;
       } else {
@@ -1312,7 +1323,7 @@ export default {
       this.axios
       .post(this.server_url + "stop_game.php", bodyFormData)
       .then(function(response) {
-        console.log(response);
+        // console.log(response);
       }.bind(this))
       .catch(function (error) {
         // handle error
@@ -1454,8 +1465,8 @@ export default {
       this.axios
       .post(this.server_url + "delete_user.php", bodyFormData)
       .then(function(response) {
-        // console.log(response);
-      })
+        this.mainMenu("Users");
+      }.bind(this))
       .catch(function (error) {
         // handle error
         console.log(error);

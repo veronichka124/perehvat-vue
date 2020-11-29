@@ -141,10 +141,18 @@ div.game_waiting #timer_on {
   background: #e60000;
 }
 
-#gps_error {
+#gps_error, .gps_error {
   font-weight: bold;
   color: red;
 }
+#gpsError .modal-header h3 {
+  margin-top: 0;
+  color: red;
+}
+#gpsError .modal-footer {
+  display: none;
+}
+
 
 .hunter-is-close {
   width: 40px;

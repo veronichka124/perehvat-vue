@@ -12,13 +12,13 @@
   "dependencies": {
     "axios": "^0.18.1",
     "nosleep.js": "^0.9.0",
-    "onsenui": "^2.10.10",
-    "vue": "^2.6.10",
+    "onsenui": "^2.11.1",
+    "vue": "^2.6.12",
     "vue-axios": "^2.1.5",
     "vue-browser-geolocation": "^1.8.0",
     "vue-onsenui": "^2.6.2",
     "vue2-google-maps": "^0.10.7",
-    "vuetify": "^1.5.18"
+    "vuetify": "^1.5.24"
   },
   "browserslist": [
     "> 1%",
@@ -35,8 +35,8 @@
     "file-loader": "^1.1.4",
     "html-webpack-plugin": "^3.2.0",
     "prerender-spa-plugin": "^3.4.0",
-    "vue-loader": "^15.7.1",
-    "vue-template-compiler": "^2.6.10",
+    "vue-loader": "^15.9.5",
+    "vue-template-compiler": "^2.6.12",
     "webpack": "^3.6.0",
     "webpack-dev-server": "^2.11.5"
   }
