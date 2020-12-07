@@ -153,6 +153,19 @@ div.game_waiting #timer_on {
   display: none;
 }
 
+.distance-to-prey {
+  font-size: 15px;
+  position: absolute;
+  z-index: 1;  
+  top: 6px;
+  right: 5px;  
+  line-height: 1;
+  margin-bottom: 40px;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.8);
+}
 
 .hunter-is-close {
   width: 40px;

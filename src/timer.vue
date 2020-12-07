@@ -122,7 +122,7 @@ export default {
 #timer {
 	position: fixed;
 	z-index: 2;
-	left: 50%;
+	left: 40%;
 }
 
 #timer_on {

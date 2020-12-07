@@ -91,11 +91,11 @@
     <!-- END MODAL -->  
     <v-ons-page>
       <div class="hunter-is-close" v-show="ios_alarm"></div>
+      <div class="distance-to-prey" v-show="!am_i_prey && distance_to_prey">{{ distance_to_prey }}</div>
     <!-- TIMER -->
     <div v-bind:class="{ game_on: game_inprogress, game_waiting: game_waiting}" id="timer">
-      <timer ref="game_timer"></timer>  
-    </div>
-    
+      <timer ref="game_timer"></timer>        
+    </div>        
 
     <!-- MENU DRAWER --> 
     <!-- Toggle button --> 
@@ -192,10 +192,10 @@
 
         <!-- USERS MENU VIEW --> 
         <div id="usersMenuView" v-if="usersMenuView"> 
-          <v-ons-list-header> Game users ({{Object.keys(markers).length}}) </v-ons-list-header>         
-          <v-ons-list v-for="(marker, index) in markers" :key="index">   
+          <v-ons-list-header> Game users ({{Object.keys(users).length}}) </v-ons-list-header>         
+          <v-ons-list v-for="(marker, index) in users" :key="index">   
             <v-ons-list-item tappable modifier="chevron longdivider" @click="userSettings(marker)">
-              <div class="left">{{marker.user_name}} (id: {{marker.id.substr(0,4)}})</div>            
+              <div v-bind:class="{ red: marker.is_prey == 1 }" class="left">{{marker.user_name}} (id: {{marker.id.substr(0,4)}})</div>            
             </v-ons-list-item> 
           </v-ons-list>
           
@@ -233,7 +233,7 @@
 
         <!-- USER SETTINGS MENU VIEW --> 
         <div id="userSettingsView" v-if="userSettingsView"> 
-          <v-ons-list v-for="(marker, index) in markers" :key="'role-' + index" v-if="selectedUserId == marker.id">    
+          <v-ons-list v-for="(marker, index) in users" :key="'role-' + index" v-if="selectedUserId == marker.id">    
             <v-ons-list-header>Role</v-ons-list-header>    
             <v-ons-list-item modifier="longdivider">
               <div class="center"> Угонщик </div>
@@ -325,6 +325,17 @@
                   {{ district }}
                 </label>
               </v-ons-list-item>
+              </div>
+            </v-ons-list-item>
+             <v-ons-list-header>Visibility radius</v-ons-list-header>
+            <v-ons-list-item>
+              <div class="center">
+                <v-ons-select style="width: 100%" v-model="radius" @change="update_radius()">
+                  <option v-for="w in 15" :value="parseInt((w*0.1+0.4)*1000)">
+                    {{ (w * 0.1 + 0.4).toFixed(1) }} km
+                  </option>
+                  <option value="2000000">2000 km</option>
+                </v-ons-select>
               </div>
             </v-ons-list-item>
           </v-ons-list>
@@ -668,11 +679,13 @@ export default {
       ],   
       game_time: 50,
       waiting_time: 10,
+      radius: 2000000,
       game_state: "nogame",
       count: 0,
       map_center: {lat:56.967122, lng:24.162491},
       markers: [],
       blocked_users: [],
+      users: [],
       drawer: null,
       newName: '',
       mainMenuView: true,
@@ -735,6 +748,14 @@ export default {
   //   checked_districts: 'update_districts'
   // },
   computed: {
+    distance_to_prey: function() {
+      if (typeof this.markers[localStorage.key_id] !== "undefined") {
+        return (this.markers[localStorage.key_id].distance/1000).toFixed(1) + "km";
+      } else {
+        return false;
+      }
+    },
+    my_id: function() { return localStorage.key_id; },
     google: gmapApi,
     game_inprogress: function() {
       return this.game_state == "inprogress";
@@ -917,6 +938,8 @@ export default {
       } else if (current == 'Users') {
         this.usersMenuView = true;
         this.step_back = 'Main';
+        // update users
+        this.fetch_users();
         this.fetch_blocked_users();
       } else if (current == 'Blocked users') {
         this.blockedUsersView = true;
@@ -936,6 +959,34 @@ export default {
             }
           })
       .then(this.users_in_block)
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      }); 
+    },
+    fetch_users: function() {
+      this.axios
+      .get(this.server_url + 'users.php', {
+            params: {
+              game: this.game,
+              password: localStorage.password,
+              id: localStorage.key_id
+            }
+          })
+      .then(function(response) {
+        this.users = response.data;
+        this.prey_switch = [];
+        for(var key in response.data) {
+          var value = response.data[key]; 
+          if (value.is_prey == '1') {          
+            //all preys in the game
+            this.prey_switch.push(value.id);            
+          }
+        }
+      }.bind(this))
       .catch(function (error) {
         // handle error
         console.log(error);
@@ -1060,7 +1111,13 @@ export default {
     },
     get_admins: function(){           
       this.intervalid1 = setInterval(function(){
-        this.axios
+        if (this.am_i_admin) {
+          // update users
+          this.fetch_users();
+          this.fetch_blocked_users();
+        }
+
+        this.axios        
         .get(this.server_url + 'get_admins.php', {
               params: {
                 game: this.game,
@@ -1161,8 +1218,7 @@ export default {
       if (this.axiosstop) return; //FIXME: hack for ios13
       var now_time = new Date().getTime()/1000;
       var default_color = 0;
-      var role = false;
-      this.prey_switch = [];
+      var role = false;      
       for(var key in response.data) {
         var value = response.data[key]; //NEW DATA
         //Accuracy
@@ -1227,10 +1283,8 @@ export default {
         } else {
           value.last_activity = (value.last_activity/60).toFixed(0) + " min";
         }
-        
-        if (value.is_prey == '1') {          
-          //all preys in the game
-          this.prey_switch.push(value.id);
+
+        if (value.is_prey == '1') {
           if (value.id == localStorage.key_id) {
             role = true;
           }
@@ -1444,6 +1498,26 @@ export default {
       //post prey info
       this.axios
       .post(this.server_url + "update_districts.php", bodyFormData)
+      .then(function(response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        // handle error
+        console.log(error);
+      })
+      .then(function () {
+        // always executed
+      }); 
+    },
+    update_radius: function() {      
+      var bodyFormData = new FormData();
+      bodyFormData.set('radius', this.radius);      
+      bodyFormData.set('game', this.game);
+      bodyFormData.set('password', localStorage.password);
+      bodyFormData.set('id', localStorage.key_id);
+      //post new visibility radius
+      this.axios
+      .post(this.server_url + "game_setup.php", bodyFormData)
       .then(function(response) {
         console.log(response);
       })
