@@ -194,8 +194,8 @@
         <div id="usersMenuView" v-if="usersMenuView"> 
           <v-ons-list-header> Game users ({{Object.keys(users).length}}) </v-ons-list-header>         
           <v-ons-list v-for="(marker, index) in users" :key="index">   
-            <v-ons-list-item tappable modifier="chevron longdivider" @click="userSettings(marker)">
-              <div v-bind:class="{ red: marker.is_prey == 1 }" class="left">{{marker.user_name}} (id: {{marker.id.substr(0,4)}})</div>            
+            <v-ons-list-item v-bind:class="{ red_list_item: marker.is_prey == 1 }" tappable modifier="chevron longdivider" @click="userSettings(marker)">
+              <div class="left">{{marker.user_name}} (id: {{marker.id.substr(0,4)}})</div>            
             </v-ons-list-item> 
           </v-ons-list>
           
@@ -330,11 +330,20 @@
              <v-ons-list-header>Visibility radius</v-ons-list-header>
             <v-ons-list-item>
               <div class="center">
-                <v-ons-select style="width: 100%" v-model="radius" @change="update_radius()">
-                  <option v-for="w in 15" :value="parseInt((w*0.1+0.4)*1000)">
+                <v-ons-select style="width: 100%" v-model="game_settings.radius" @change="update_game_setting()">
+                  <option v-for="w in 25" :value="parseInt((w*0.1+0.4)*1000)">
                     {{ (w * 0.1 + 0.4).toFixed(1) }} km
                   </option>
                   <option value="2000000">2000 km</option>
+                </v-ons-select>
+              </div>
+            </v-ons-list-item>  
+             <v-ons-list-header>Game version</v-ons-list-header>      
+            <v-ons-list-item>
+              <div class="center">
+                <v-ons-select style="width: 100%" v-model="game_settings.game_type" @change="update_game_setting()">          
+                  <option value="0">Old game</option>
+                  <option value="1">New game</option>
                 </v-ons-select>
               </div>
             </v-ons-list-item>
@@ -679,8 +688,8 @@ export default {
       ],   
       game_time: 50,
       waiting_time: 10,
-      radius: 2000000,
       game_state: "nogame",
+      game_settings: null,
       count: 0,
       map_center: {lat:56.967122, lng:24.162491},
       markers: [],
@@ -744,9 +753,7 @@ export default {
       bg_distance: 'none',
     }
   },
-  // watch: {
-  //   checked_districts: 'update_districts'
-  // },
+
   computed: {
     distance_to_prey: function() {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
@@ -1036,8 +1043,6 @@ export default {
       }
     },
     preyChange: function(marker) {
-      // console.log(marker);
-      // console.log(this.prey_switch);
       var is_prey = false;
       if (this.prey_switch.includes(marker.id)) { 
         is_prey = false; 
@@ -1389,7 +1394,6 @@ export default {
     },
     get_game_settings: function(response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
-      // console.log(response);
       this.game_settings = response.data;
       var remaining_time = 0;
       var new_game_state = "";
@@ -1411,7 +1415,7 @@ export default {
           remaining_time = 0;
           new_game_state = "stopped";
         }   
-        // console.log('remaining time: '+remaining_time);
+
         if (this.game_state != new_game_state) {
           this.game_state = new_game_state;          
         }
@@ -1481,8 +1485,6 @@ export default {
       }.bind(this), 2000);
     },
     update_districts: function(district) {
-      console.log(district);
-      console.log(this.checked_districts);
       var checked = false;
       if (this.checked_districts.includes(district)) { 
          checked = false;
@@ -1509,9 +1511,10 @@ export default {
         // always executed
       }); 
     },
-    update_radius: function() {      
+    update_game_setting: function() {
       var bodyFormData = new FormData();
-      bodyFormData.set('radius', this.radius);      
+      bodyFormData.set('game_type', this.game_settings.game_type); 
+      bodyFormData.set('radius', this.game_settings.radius);      
       bodyFormData.set('game', this.game);
       bodyFormData.set('password', localStorage.password);
       bodyFormData.set('id', localStorage.key_id);
@@ -1519,7 +1522,6 @@ export default {
       this.axios
       .post(this.server_url + "game_setup.php", bodyFormData)
       .then(function(response) {
-        console.log(response);
       })
       .catch(function (error) {
         // handle error
