@@ -91,7 +91,7 @@
     <!-- END MODAL -->  
     <v-ons-page>
       <div class="hunter-is-close" v-show="ios_alarm"></div>
-      <div class="distance-to-prey" v-show="!am_i_prey && distance_to_prey">{{ distance_to_prey }}</div>
+      <div v-bind:class="{ yellow: prey_marker_age > 5 && prey_marker_age <= 15, red: prey_marker_age > 15}" class="distance-to-prey" v-show="!am_i_prey && distance_to_prey">{{ distance_to_prey }} </div>
     <!-- TIMER -->
     <div v-bind:class="{ game_on: game_inprogress, game_waiting: game_waiting}" id="timer">
       <timer ref="game_timer"></timer>        
@@ -757,9 +757,17 @@ export default {
   computed: {
     distance_to_prey: function() {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
-        return (this.markers[localStorage.key_id].distance/1000).toFixed(1) + "km";
+        return (this.markers[localStorage.key_id].prey_info.distance/1000).toFixed(1) + "km";
       } else {
         return false;
+      }
+    },
+    prey_marker_age: function() {
+      if (typeof this.markers[localStorage.key_id] !== "undefined" 
+          && this.markers[localStorage.key_id].prey_info.last_activity !== null) {        
+        return this.markers[localStorage.key_id].prey_info.last_activity.toFixed(0);
+      } else {
+        return 0;
       }
     },
     my_id: function() { return localStorage.key_id; },
