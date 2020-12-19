@@ -157,7 +157,7 @@ div.game_waiting #timer_on {
   font-size: 15px;
   position: absolute;
   z-index: 1;  
-  top: 6px;
+  top: 0px;
   right: 5px;  
   line-height: 1;
   margin-bottom: 40px;
