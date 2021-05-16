@@ -403,8 +403,7 @@
         <div class="info-box">
           <span class="info-box-title">{{marker.user_name}}</span> <br>
           <span v-if="am_i_admin" class="info-box-suntitle">(id: {{marker.id.substr(0,4)}})<br></span> 
-          <span class="info-box-subtitle">{{marker.speed}} km/h</span> <br>
-          <span v-if="am_i_admin" class="info-box-suntitle">(avg_speed: {{marker.avg_speed}} km/h)<br></span> 
+          <span class="info-box-subtitle">{{marker.speed}} km/h</span> <br>          
           <span class="info-box-subtitle">{{marker.last_activity}} ago</span>
         </div>
     </GmapInfoWindow>
