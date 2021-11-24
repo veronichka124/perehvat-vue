@@ -441,7 +441,7 @@
 
 <script>
   import NoSleep from './assets/NoSleep.min.js';
-  import {gmapApi} from 'vue2-google-maps';
+  import {gmapApi} from 'vue2-google-maps';  
 
 export default {
   name: 'app',  
@@ -862,7 +862,7 @@ export default {
         timeout: 5000
     };
     id = navigator.geolocation.watchPosition(this.geo_update, this.geo_error, options);
-
+    
     // pre render
     document.dispatchEvent(new Event('render-event'))
   },
@@ -1315,9 +1315,25 @@ export default {
       this.markers = response.data;    
     },
     markers_update_interval: function(){
+      let urlParams = new URLSearchParams(window.location.search);      
+      let interval = 300;
+      let time = 0;
+      let server_url = this.server_url;
+      let marker_url = server_url;
+
+      if (urlParams.has('time')) {
+          time = parseInt(urlParams.get('time')); 
+          interval = 1000;
+          marker_url = server_url + "history_markers.php?time=" + time;
+      }
+
       this.intervalid1 = setInterval(function(){
+        if (time > 0) {
+              time += 1; // increase current history timestamp
+              marker_url = server_url + "history_markers.php?time=" + time;              
+        }          
         this.axios
-        .get(this.server_url, {
+        .get(marker_url, {
               params: {
                 game: this.game,
                 id: localStorage.key_id,
@@ -1330,9 +1346,9 @@ export default {
           console.log(error);
         })
         .then(function () {
-          // always executed
+          // always executed          
         });            
-      }.bind(this), 300);
+      }.bind(this), interval);
     },
     alarm: function(response) {
       if (response.data == true) {
