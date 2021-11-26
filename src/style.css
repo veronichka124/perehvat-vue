@@ -141,6 +141,12 @@ div.game_waiting #timer_on {
   background: #e60000;
 }
 
+#replayBtn, #stopReplayBtn {
+  width: 90%;
+  margin: 10px auto;
+  background: #AAAAAA;
+}
+
 #gps_error, .gps_error {
   font-weight: bold;
   color: red;

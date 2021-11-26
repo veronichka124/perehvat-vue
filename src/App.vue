@@ -347,6 +347,23 @@
                 </v-ons-select>
               </div>
             </v-ons-list-item>
+            <v-ons-list-header>Replay</v-ons-list-header>
+            <v-ons-list-item>
+             <div class="center">
+               <v-ons-input type="date" placeholder="date" v-model="replay_date" > </v-ons-input>
+             </div>
+            </v-ons-list-item>
+            <v-ons-list-item>
+             <div class="center">
+               <v-ons-input type="time" placeholder="time" v-model="replay_time"> </v-ons-input>
+             </div>
+            </v-ons-list-item>
+            <v-ons-list-item>
+             <div class="center">
+                 <v-ons-button modifier="large" id="replayBtn" class="btn-round" @click="startReplay">▶</v-ons-button>
+                 <v-ons-button modifier="large" id="stopReplayBtn" class="btn-round" @click="stopReplay">■</v-ons-button>
+             </div>
+            </v-ons-list-item>          
           </v-ons-list>
         </div>
     </v-navigation-drawer>
@@ -441,7 +458,7 @@
 
 <script>
   import NoSleep from './assets/NoSleep.min.js';
-  import {gmapApi} from 'vue2-google-maps';  
+  import {gmapApi} from 'vue2-google-maps';    
 
 export default {
   name: 'app',  
@@ -751,6 +768,8 @@ export default {
       user_to_unblock: '',
       ios_alarm: false,
       bg_distance: 'none',
+      replay_date: 0,
+      replay_time: 0,
     }
   },
 
@@ -1315,23 +1334,16 @@ export default {
       this.markers = response.data;    
     },
     markers_update_interval: function(){
-      let urlParams = new URLSearchParams(window.location.search);      
-      let interval = 300;
-      let time = 0;
-      let server_url = this.server_url;
-      let marker_url = server_url;
-
-      if (urlParams.has('time')) {
-          time = parseInt(urlParams.get('time')); 
-          interval = 1000;
-          marker_url = server_url + "history_markers.php?time=" + time;
-      }
+      let interval = 1000;
+      let marker_url = "";
 
       this.intervalid1 = setInterval(function(){
-        if (time > 0) {
-              time += 1; // increase current history timestamp
-              marker_url = server_url + "history_markers.php?time=" + time;              
-        }          
+        if (this.real_replay_time > 0) {          
+          marker_url = this.server_url + "history_markers.php?time=" + this.real_replay_time;
+          this.real_replay_time += 1; // increase current history timestamp        
+        } else {
+          marker_url = this.server_url;
+        }
         this.axios
         .get(marker_url, {
               params: {
@@ -1383,6 +1395,12 @@ export default {
           this.ios_alarm = false;
         }
       }.bind(this), 2000);     
+    },
+    startReplay: function() {
+      this.real_replay_time = parseInt((new Date(this.replay_date+" "+this.replay_time).getTime() / 1000).toFixed(0));
+    },
+    stopReplay: function() {
+      this.real_replay_time = 0;
     },
     startGame: function() {
       var bodyFormData = new FormData();
