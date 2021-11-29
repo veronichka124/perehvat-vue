@@ -351,12 +351,12 @@
             <v-ons-list-header>Replay</v-ons-list-header>
             <v-ons-list-item>
              <div class="center">
-               <v-ons-input type="date" placeholder="date" v-model="replay_date" > </v-ons-input>
+               <v-ons-input class="replay_input" type="date" placeholder="date" v-model="replay_date" > </v-ons-input>
              </div>
             </v-ons-list-item>
             <v-ons-list-item>
              <div class="center">
-               <v-ons-input type="time" placeholder="time" v-model="replay_time"> </v-ons-input>
+               <v-ons-input class="replay_input" type="time" placeholder="time" v-model="replay_time"> </v-ons-input>
              </div>
             </v-ons-list-item>
             <v-ons-list-item>
