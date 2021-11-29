@@ -388,7 +388,7 @@
       @click="window_open = false"
     >
 
-    <gmap-circle :center="prey_position" :radius="prey_accuracy" :options="{editable: false}"> </gmap-circle>
+    <gmap-circle :center="prey_position" :radius="prey_accuracy" :options="{editable: false, strokeOpacity: 0}"> </gmap-circle>
 
     <GmapMarker  
       v-for="marker in markers"    
@@ -787,7 +787,7 @@ export default {
     },
     prey_accuracy: function() {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {        
-        return (this.markers[localStorage.key_id].prey_info.max_offset);
+        return (this.markers[localStorage.key_id].prey_info.max_offset*2);
       } else {
         return 0;
       }
