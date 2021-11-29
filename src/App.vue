@@ -343,7 +343,8 @@
               <div class="center">
                 <v-ons-select style="width: 100%" v-model="game_settings.game_type" @change="update_game_setting()">          
                   <option value="0">Old game</option>
-                  <option value="1">New game</option>
+                  <option value="1">Standard</option>
+                  <option value="2">New game</option>
                 </v-ons-select>
               </div>
             </v-ons-list-item>
@@ -386,6 +387,8 @@
       @center_changed="new_center"
       @click="window_open = false"
     >
+
+    <gmap-circle :center="prey_position" :radius="prey_accuracy" :options="{editable: false}"> </gmap-circle>
 
     <GmapMarker  
       v-for="marker in markers"    
@@ -709,6 +712,7 @@ export default {
       game_settings: null,
       count: 0,
       map_center: {lat:56.967122, lng:24.162491},
+      prey_position: {lat:56.967122, lng:24.162491},
       markers: [],
       blocked_users: [],
       users: [],
@@ -781,6 +785,13 @@ export default {
         return false;
       }
     },
+    prey_accuracy: function() {
+      if (typeof this.markers[localStorage.key_id] !== "undefined") {        
+        return (this.markers[localStorage.key_id].prey_info.max_offset);
+      } else {
+        return 0;
+      }
+    },   
     distance_to_prey: function() {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
         return (this.markers[localStorage.key_id].prey_info.distance/1000).toFixed(1) + "km";
@@ -1327,6 +1338,7 @@ export default {
           if (value.id == localStorage.key_id) {
             role = true;
           }
+          this.prey_position = {lat:value.geolocation_lat, lng:value.geolocation_lng};
         }
       }
       this.am_i_prey = role;  
