@@ -356,7 +356,7 @@
             </v-ons-list-item>
             <v-ons-list-item>
              <div class="center">
-               <v-ons-input class="replay_input" type="time" placeholder="time" v-model="replay_time"> </v-ons-input>
+               <v-ons-input class="replay_input" type="text" placeholder="0:00" v-model="replay_time"> </v-ons-input>
              </div>
             </v-ons-list-item>
             <v-ons-list-item>
@@ -773,7 +773,7 @@ export default {
       ios_alarm: false,
       bg_distance: 'none',
       replay_date: 0,
-      replay_time: 0,
+      replay_time: "0:00",
     }
   },
 
@@ -1352,7 +1352,7 @@ export default {
       this.intervalid1 = setInterval(function(){
         if (this.real_replay_time > 0) {          
           marker_url = this.server_url + "history_markers.php?time=" + this.real_replay_time;
-          this.real_replay_time += 1; // increase current history timestamp        
+          this.real_replay_time += 2; // increase current history timestamp        
         } else {
           marker_url = this.server_url;
         }
@@ -1409,7 +1409,7 @@ export default {
       }.bind(this), 2000);     
     },
     startReplay: function() {
-      this.real_replay_time = parseInt((new Date(this.replay_date+" "+this.replay_time).getTime() / 1000).toFixed(0));
+      this.real_replay_time = parseInt((new Date(this.replay_date+"T"+this.replay_time).getTime() / 1000).toFixed(0));
     },
     stopReplay: function() {
       this.real_replay_time = 0;
