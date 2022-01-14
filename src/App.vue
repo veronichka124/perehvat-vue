@@ -356,7 +356,7 @@
             </v-ons-list-item>
             <v-ons-list-item>
              <div class="center">
-               <v-ons-input class="replay_input" type="text" placeholder="0:00" v-model="replay_time"> </v-ons-input>
+               <v-ons-input class="replay_input" type="text" placeholder="00:00" v-model="replay_time"> </v-ons-input>
              </div>
             </v-ons-list-item>
             <v-ons-list-item>
@@ -773,7 +773,7 @@ export default {
       ios_alarm: false,
       bg_distance: 'none',
       replay_date: 0,
-      replay_time: "0:00",
+      replay_time: "00:00",
     }
   },
 
