@@ -296,7 +296,7 @@
             <v-ons-list-item>
               <div class="center">
                 <v-ons-select style="width: 100%" v-model="waiting_time" >
-                  <option v-for="w in 15" :value="w">
+                  <option v-for="(n, w) in 15" :value="w">
                     {{ w }}
                   </option>
                 </v-ons-select>
