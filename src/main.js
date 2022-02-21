@@ -12,9 +12,9 @@ import Vuetify from "vuetify";
 import "vuetify/dist/vuetify.min.css";
 
 import App from "./App.vue";
-import modal from "./modal-template.vue";
-import ButtonCounter from "./button-counter.vue";
-import timer from "./timer.vue";
+import modal from "./components/modal-template.vue";
+import ButtonCounter from "./components/button-counter.vue";
+import timer from "./components/timer.vue";
 import MainMap from "./components/map.vue";
 import "./style.css";
 
