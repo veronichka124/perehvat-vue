@@ -653,6 +653,7 @@ import {
   Districts,
   jelgavaDistrict
 } from "../constants/districts.js";
+import { server_url } from "../constants/server";
 
 export default {
   name: "main-map",
@@ -725,8 +726,7 @@ export default {
       name: "Me",
       speed: "",
       test: null,
-      // server_url: 'http://localhost/perehvat-vue/',
-      server_url: "https://perehvat.lv/perehvat-vue/",
+      server_url: server_url,
       pos: "",
       start_time: "",
       geolocation_error: false,
