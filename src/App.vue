@@ -296,7 +296,7 @@
             <v-ons-list-item>
               <div class="center">
                 <v-ons-select style="width: 100%" v-model="waiting_time" >
-                  <option v-for="w in 15" :value="w">
+                  <option v-for="(n, w) in 15" :value="w">
                     {{ w }}
                   </option>
                 </v-ons-select>
@@ -343,10 +343,28 @@
               <div class="center">
                 <v-ons-select style="width: 100%" v-model="game_settings.game_type" @change="update_game_setting()">          
                   <option value="0">Old game</option>
-                  <option value="1">New game</option>
+                  <option value="1">Standard</option>
+                  <option value="2">New game</option>
                 </v-ons-select>
               </div>
             </v-ons-list-item>
+            <v-ons-list-header>Replay</v-ons-list-header>
+            <v-ons-list-item>
+             <div class="center">
+               <v-ons-input class="replay_input" type="date" placeholder="date" v-model="replay_date" > </v-ons-input>
+             </div>
+            </v-ons-list-item>
+            <v-ons-list-item>
+             <div class="center">
+               <v-ons-input class="replay_input" type="text" placeholder="00:00" v-model="replay_time"> </v-ons-input>
+             </div>
+            </v-ons-list-item>
+            <v-ons-list-item>
+             <div class="center">
+                 <v-ons-button modifier="large" id="replayBtn" class="btn-round" @click="startReplay">▶</v-ons-button>
+                 <v-ons-button modifier="large" id="stopReplayBtn" class="btn-round" @click="stopReplay">■</v-ons-button>
+             </div>
+            </v-ons-list-item>          
           </v-ons-list>
         </div>
     </v-navigation-drawer>
@@ -369,6 +387,8 @@
       @center_changed="new_center"
       @click="window_open = false"
     >
+
+    <gmap-circle :center="prey_position" :radius="prey_accuracy" :options="{editable: false, strokeOpacity: 0}"> </gmap-circle>
 
     <GmapMarker  
       v-for="marker in markers"    
@@ -441,7 +461,7 @@
 
 <script>
   import NoSleep from './assets/NoSleep.min.js';
-  import {gmapApi} from 'vue2-google-maps';
+  import {gmapApi} from 'vue2-google-maps';    
 
 export default {
   name: 'app',  
@@ -692,6 +712,7 @@ export default {
       game_settings: null,
       count: 0,
       map_center: {lat:56.967122, lng:24.162491},
+      prey_position: {lat:56.967122, lng:24.162491},
       markers: [],
       blocked_users: [],
       users: [],
@@ -751,6 +772,8 @@ export default {
       user_to_unblock: '',
       ios_alarm: false,
       bg_distance: 'none',
+      replay_date: 0,
+      replay_time: "00:00",
     }
   },
 
@@ -762,6 +785,13 @@ export default {
         return false;
       }
     },
+    prey_accuracy: function() {
+      if (typeof this.markers[localStorage.key_id] !== "undefined") {        
+        return (this.markers[localStorage.key_id].prey_info.max_offset*2);
+      } else {
+        return 0;
+      }
+    },   
     distance_to_prey: function() {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
         return (this.markers[localStorage.key_id].prey_info.distance/1000).toFixed(1) + "km";
@@ -862,7 +892,7 @@ export default {
         timeout: 5000
     };
     id = navigator.geolocation.watchPosition(this.geo_update, this.geo_error, options);
-
+    
     // pre render
     document.dispatchEvent(new Event('render-event'))
   },
@@ -1308,6 +1338,7 @@ export default {
           if (value.id == localStorage.key_id) {
             role = true;
           }
+          this.prey_position = {lat:value.geolocation_lat, lng:value.geolocation_lng};
         }
       }
       this.am_i_prey = role;  
@@ -1315,9 +1346,18 @@ export default {
       this.markers = response.data;    
     },
     markers_update_interval: function(){
+      let interval = 1000;
+      let marker_url = "";
+
       this.intervalid1 = setInterval(function(){
+        if (this.real_replay_time > 0) {          
+          marker_url = this.server_url + "history_markers.php?time=" + this.real_replay_time;
+          this.real_replay_time += 2; // increase current history timestamp        
+        } else {
+          marker_url = this.server_url;
+        }
         this.axios
-        .get(this.server_url, {
+        .get(marker_url, {
               params: {
                 game: this.game,
                 id: localStorage.key_id,
@@ -1330,9 +1370,9 @@ export default {
           console.log(error);
         })
         .then(function () {
-          // always executed
+          // always executed          
         });            
-      }.bind(this), 300);
+      }.bind(this), interval);
     },
     alarm: function(response) {
       if (response.data == true) {
@@ -1367,6 +1407,12 @@ export default {
           this.ios_alarm = false;
         }
       }.bind(this), 2000);     
+    },
+    startReplay: function() {
+      this.real_replay_time = parseInt((new Date(this.replay_date+"T"+this.replay_time).getTime() / 1000).toFixed(0));
+    },
+    stopReplay: function() {
+      this.real_replay_time = 0;
     },
     startGame: function() {
       var bodyFormData = new FormData();
