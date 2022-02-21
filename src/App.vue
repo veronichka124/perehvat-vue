@@ -10,7 +10,7 @@ export default {
   name: "app",
   data() {
     return {
-      isMapVisible: true,
+      isMapVisible: false,
       server_url: server_url
     };
   },
@@ -23,7 +23,7 @@ export default {
         .get(this.server_url + "settings.php")
         .then(res => {
           const { map_visible } = res.data;
-          this.isMapVisible = !!map_visible;
+          this.isMapVisible = !!Number(map_visible);
         })
         .catch(err => console.log(err));
     }
