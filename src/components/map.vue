@@ -2,26 +2,14 @@
   <div id="main-map">
     <!-- MODAL -->
     <!-- Start  screen -->
-    <modal
-      id="startScreen"
-      v-if="showStartScreen && !geolocation_error"
-      @close="
-        dialog = showStartScreen = false;
-        screenLock();
-      "
-    >
-      <h3 slot="header">Welcome!!</h3>
-      <div slot="body" class="text-xs-center">
-        <!-- on click showCreateGameScreen=true -->
-        <v-btn round color="primary" dark @click="showCreateGameScreen = true"
-          >Create new game</v-btn
-        >
-        <!-- on click show join game modal -->
-        <v-btn round color="secondary" dark @click="showJoinGameScreen = true"
-          >Join game</v-btn
-        >
-      </div>
-    </modal>
+    <start-modal
+      v-bind:showStartScreen="showStartScreen"
+      v-bind:geolocation_error="geolocation_error"
+      @handleShowCreateGameScreen="showCreateGameScreen = true"
+      @handleShowJoinGameScreen="showJoinGameScreen = true"
+      @handleClose="handleCloseStartDialog"
+    />
+
     <!-- Create game  screen -->
     <modal
       id="createGameScreen"
@@ -114,7 +102,7 @@
       <div
         v-bind:class="{
           yellow: prey_marker_age > 5 && prey_marker_age <= 15,
-          red: prey_marker_age > 15
+          red: prey_marker_age > 15,
         }"
         class="distance-to-prey"
         v-show="!am_i_prey && distance_to_prey"
@@ -552,9 +540,9 @@
           streetViewControl: false,
           rotateControl: true,
           fullscreenControl: false,
-          disableDefaultUi: true
+          disableDefaultUi: true,
         }"
-        style="width: auto; position: static;"
+        style="width: auto; position: static"
         @center_changed="new_center"
         @click="window_open = false"
       >
@@ -572,11 +560,11 @@
             text: marker.user_name,
             fontSize: '11px',
             fontWeight: 'bold',
-            color: marker.text_color
+            color: marker.text_color,
           }"
           :position="{
             lat: marker.geolocation_lat,
-            lng: marker.geolocation_lng
+            lng: marker.geolocation_lng,
           }"
           :clickable="true"
           :draggable="false"
@@ -589,15 +577,15 @@
           :key="marker.id + 'info'"
           :position="{
             lat: marker.geolocation_lat,
-            lng: marker.geolocation_lng
+            lng: marker.geolocation_lng,
           }"
           :opened="window_open == marker.id"
           :options="{
             pixelOffset: {
               width: 0,
               height: -35,
-              opacity: 0.2
-            }
+              opacity: 0.2,
+            },
           }"
         >
           <div class="info-box">
@@ -622,7 +610,7 @@
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
             strokeWeight: 1,
-            fillOpacity: 0.2
+            fillOpacity: 0.2,
           }"
         >
         </GmapPolygon>
@@ -634,7 +622,7 @@
             strokeColor: '#FF0000',
             strokeOpacity: 0.8,
             strokeWeight: 1,
-            fillOpacity: 0
+            fillOpacity: 0,
           }"
         >
         </GmapPolygon>
@@ -644,14 +632,13 @@
 </template>
 
 <script>
-//import NoSleep from '../assets/NoSleep.min.js';
 import { gmapApi } from "vue2-google-maps";
 import { colors } from "../constants/CarColors.js";
 import { CarIcon } from "../constants/carIcon.js";
 import {
   DistrictNames,
   Districts,
-  jelgavaDistrict
+  jelgavaDistrict,
 } from "../constants/districts.js";
 import { server_url } from "../constants/server";
 
@@ -707,11 +694,11 @@ export default {
       admin_menu: [
         { title: "Profile", icon: "user" },
         { title: "Users", icon: "users" },
-        { title: "Game settings", icon: "cog" }
+        { title: "Game settings", icon: "cog" },
       ],
       user_menu: [
         { title: "Profile", icon: "user" },
-        { title: "Users", icon: "users" }
+        { title: "Users", icon: "users" },
       ],
       show: false,
       menu: false,
@@ -734,12 +721,12 @@ export default {
       ios_alarm: false,
       bg_distance: "none",
       replay_date: 0,
-      replay_time: "00:00"
+      replay_time: "00:00",
     };
   },
 
   computed: {
-    prey_speed: function() {
+    prey_speed: function () {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
         return (
           (this.markers[localStorage.key_id].prey_info.speed || 0).toFixed(0) +
@@ -749,14 +736,14 @@ export default {
         return false;
       }
     },
-    prey_accuracy: function() {
+    prey_accuracy: function () {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
         return this.markers[localStorage.key_id].prey_info.max_offset * 2;
       } else {
         return 0;
       }
     },
-    distance_to_prey: function() {
+    distance_to_prey: function () {
       if (typeof this.markers[localStorage.key_id] !== "undefined") {
         return (
           (this.markers[localStorage.key_id].prey_info.distance / 1000).toFixed(
@@ -767,7 +754,7 @@ export default {
         return false;
       }
     },
-    prey_marker_age: function() {
+    prey_marker_age: function () {
       if (
         typeof this.markers[localStorage.key_id] !== "undefined" &&
         this.markers[localStorage.key_id].prey_info.last_activity !== null
@@ -779,18 +766,18 @@ export default {
         return 0;
       }
     },
-    my_id: function() {
+    my_id: function () {
       return localStorage.key_id;
     },
     google: gmapApi,
-    game_inprogress: function() {
+    game_inprogress: function () {
       return this.game_state == "inprogress";
     },
-    game_waiting: function() {
+    game_waiting: function () {
       return this.game_state == "waiting";
-    }
+    },
   },
-  mounted: function() {
+  mounted: function () {
     // var noSleep = new NoSleep();
 
     // document.addEventListener('click', function enableNoSleep() {
@@ -803,24 +790,24 @@ export default {
       var v = navigator.appVersion.match(/OS (\d+)_(\d+)_?(\d+)?/);
       v = [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
       if (v[0] >= 13) {
-        document.addEventListener("pointerdown", e => {
+        document.addEventListener("pointerdown", (e) => {
           this.axiosstop = true;
           setTimeout(
-            function() {
+            function () {
               this.axiosstop = false;
             }.bind(this),
             1000
           );
         });
 
-        document.addEventListener("click", e => {
+        document.addEventListener("click", (e) => {
           this.axiosstop = false;
         });
       }
     }
 
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(position => {
+      navigator.geolocation.getCurrentPosition((position) => {
         this.final_center.lat = position.coords.latitude;
         this.final_center.lng = position.coords.longitude;
         this.map_center.lat = position.coords.latitude;
@@ -868,7 +855,7 @@ export default {
     options = {
       enableHighAccuracy: true,
       maximumAge: 0,
-      timeout: 5000
+      timeout: 5000,
     };
     id = navigator.geolocation.watchPosition(
       this.geo_update,
@@ -880,7 +867,7 @@ export default {
     document.dispatchEvent(new Event("render-event"));
   },
   methods: {
-    createGame: function() {
+    createGame: function () {
       var bodyFormData = new FormData();
       bodyFormData.set("creator", this.key);
       bodyFormData.set("name", this.newGame);
@@ -889,7 +876,7 @@ export default {
       this.axios
         .post(this.server_url + "new_game.php", bodyFormData)
         .then(
-          function(response) {
+          function (response) {
             // console.log(response);
             if (response.data == true) {
               //join game
@@ -903,15 +890,15 @@ export default {
             }
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    joinGame: function(game) {
+    joinGame: function (game) {
       //check if game exists
       if (game != localStorage.game) {
         this.axios
@@ -919,11 +906,11 @@ export default {
             params: {
               name: game,
               password: localStorage.password,
-              id: localStorage.key_id
-            }
+              id: localStorage.key_id,
+            },
           })
           .then(
-            function(response) {
+            function (response) {
               // console.log(response.data);
               if (response.data == false) {
                 //game does not exist
@@ -942,11 +929,11 @@ export default {
               }
             }.bind(this)
           )
-          .catch(function(error) {
+          .catch(function (error) {
             // handle error
             console.log(error);
           })
-          .then(function() {
+          .then(function () {
             // always executed
           });
       } else {
@@ -955,7 +942,7 @@ export default {
         this.dialog = false;
       }
     },
-    mainMenu: function(current) {
+    mainMenu: function (current) {
       // console.log('current: '+current);
       // console.log('back: '+this.step_back);
       //toolbar header
@@ -988,35 +975,35 @@ export default {
         this.step_back = "Main";
       }
     },
-    fetch_blocked_users: function() {
+    fetch_blocked_users: function () {
       this.axios
         .get(this.server_url + "blocked_users.php", {
           params: {
             game: this.game,
             password: localStorage.password,
-            id: localStorage.key_id
-          }
+            id: localStorage.key_id,
+          },
         })
         .then(this.users_in_block)
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    fetch_users: function() {
+    fetch_users: function () {
       this.axios
         .get(this.server_url + "users.php", {
           params: {
             game: this.game,
             password: localStorage.password,
-            id: localStorage.key_id
-          }
+            id: localStorage.key_id,
+          },
         })
         .then(
-          function(response) {
+          function (response) {
             this.users = response.data;
             this.prey_switch = [];
             for (var key in response.data) {
@@ -1028,24 +1015,24 @@ export default {
             }
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    users_in_block: function(response) {
+    users_in_block: function (response) {
       this.blocked_users = [];
       response.data.forEach(
-        function(value, key) {
+        function (value, key) {
           this.blocked_users.push(value);
         }.bind(this)
       );
       // console.log(this.blocked_users);
     },
-    unblock_user: function(user) {
+    unblock_user: function (user) {
       // console.log(user);
       // this.blockedActionSheet = true;
       var bodyFormData = new FormData();
@@ -1056,15 +1043,15 @@ export default {
       this.axios
         .post(this.server_url + "unblock_user.php", bodyFormData)
         .then(
-          function(response) {
+          function (response) {
             this.mainMenu("Users");
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
       this.blockedActionSheet = false;
@@ -1072,7 +1059,7 @@ export default {
       this.blockedUsersView = false;
       this.usersMenuView = true;
     },
-    userSettings: function(user) {
+    userSettings: function (user) {
       if (this.am_i_admin == true) {
         this.mainMenu(user.user_name);
         this.userSettingsView = true;
@@ -1080,7 +1067,7 @@ export default {
         this.selectedUserId = user.id;
       }
     },
-    preyChange: function(marker) {
+    preyChange: function (marker) {
       var is_prey = false;
       if (this.prey_switch.includes(marker.id)) {
         is_prey = false;
@@ -1096,19 +1083,19 @@ export default {
       //post prey info
       this.axios
         .post(this.server_url + "set_prey.php", bodyFormData)
-        .then(function(response) {
+        .then(function (response) {
           // console.log(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
       //get prey info
     },
-    set_admin: function(marker) {
+    set_admin: function (marker) {
       // console.log(this.admin_switch);
       var admin_checked = false;
       if (this.admin_switch.includes(marker.id)) {
@@ -1125,19 +1112,19 @@ export default {
       //post prey info
       this.axios
         .post(this.server_url + "set_admin.php", bodyFormData)
-        .then(function(response) {
+        .then(function (response) {
           // console.log(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
       //get prey info
     },
-    game_admins: function(response) {
+    game_admins: function (response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
       //all admins
       this.admins = response.data;
@@ -1145,7 +1132,7 @@ export default {
       var role = false;
       this.admin_switch = [];
       this.admins.forEach(
-        function(value, key) {
+        function (value, key) {
           if (value.user_id == localStorage.key_id) {
             role = true;
           }
@@ -1154,9 +1141,9 @@ export default {
       );
       this.am_i_admin = role;
     },
-    get_admins: function() {
+    get_admins: function () {
       this.intervalid1 = setInterval(
-        function() {
+        function () {
           if (this.am_i_admin) {
             // update users
             this.fetch_users();
@@ -1168,33 +1155,33 @@ export default {
               params: {
                 game: this.game,
                 id: localStorage.key_id,
-                password: localStorage.password
-              }
+                password: localStorage.password,
+              },
             })
             .then(this.game_admins)
-            .catch(function(error) {
+            .catch(function (error) {
               // handle error
               console.log(error);
             })
-            .then(function() {
+            .then(function () {
               // always executed
             });
         }.bind(this),
         5000
       );
     },
-    new_center: function(pos) {
+    new_center: function (pos) {
       // save new map center
       this.final_center.lat = pos.lat;
       this.final_center.lng = pos.lng;
     },
-    showInfo: function(marker) {
+    showInfo: function (marker) {
       // move map center
       this.final_center.lat = marker.geolocation_lat;
       this.final_center.lng = marker.geolocation_lat;
       this.map_center = {
         lat: marker.geolocation_lat + Math.random() * 0.000001,
-        lng: marker.geolocation_lng
+        lng: marker.geolocation_lng,
       };
       if (this.window_open == marker.id) {
         this.window_open = false;
@@ -1203,16 +1190,17 @@ export default {
       }
       this.speed = marker.speed;
     },
-    uuidv4: function() {
-      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function(
-        c
-      ) {
-        var r = (Math.random() * 16) | 0,
-          v = c == "x" ? r : (r & 0x3) | 0x8;
-        return v.toString(16);
-      });
+    uuidv4: function () {
+      return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+        /[xy]/g,
+        function (c) {
+          var r = (Math.random() * 16) | 0,
+            v = c == "x" ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        }
+      );
     },
-    geo_update: function(pos) {
+    geo_update: function (pos) {
       this.geolocation_error = false;
       localStorage.color = this.marker_color;
       this.pos = pos;
@@ -1231,18 +1219,18 @@ export default {
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_location.php", bodyFormData)
-        .then(function(response) {
+        .then(function (response) {
           // console.log(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    changeName: function() {
+    changeName: function () {
       localStorage.name = this.newName;
       // console.log(localStorage.name);
       this.name = localStorage.name;
@@ -1252,23 +1240,23 @@ export default {
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_name.php", bodyFormData)
-        .then(function(response) {
+        .then(function (response) {
           // console.log(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
       this.showChangeNameScreen = false;
       this.dialog = false;
     },
-    geo_error: function(err) {
+    geo_error: function (err) {
       this.geolocation_error = true;
     },
-    get_markers: function(response) {
+    get_markers: function (response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
       var now_time = new Date().getTime() / 1000;
       var default_color = 0;
@@ -1344,7 +1332,7 @@ export default {
           strokeWeight: 0.1,
           fillOpacity: 1,
           fillColor: color,
-          rotation: heading
+          rotation: heading,
         };
         // last marker update
         if (parseInt(value.last_activity) < 60) {
@@ -1359,7 +1347,7 @@ export default {
           }
           this.prey_position = {
             lat: value.geolocation_lat,
-            lng: value.geolocation_lng
+            lng: value.geolocation_lng,
           };
         }
       }
@@ -1367,12 +1355,12 @@ export default {
 
       this.markers = response.data;
     },
-    markers_update_interval: function() {
+    markers_update_interval: function () {
       let interval = 1000;
       let marker_url = "";
 
       this.intervalid1 = setInterval(
-        function() {
+        function () {
           if (this.real_replay_time > 0) {
             marker_url =
               this.server_url +
@@ -1387,22 +1375,22 @@ export default {
               params: {
                 game: this.game,
                 id: localStorage.key_id,
-                password: localStorage.password
-              }
+                password: localStorage.password,
+              },
             })
             .then(this.get_markers)
-            .catch(function(error) {
+            .catch(function (error) {
               // handle error
               console.log(error);
             })
-            .then(function() {
+            .then(function () {
               // always executed
             });
         }.bind(this),
         interval
       );
     },
-    alarm: function(response) {
+    alarm: function (response) {
       if (response.data == true) {
         this.alarm_audio.play();
         this.ios_alarm = true;
@@ -1411,24 +1399,24 @@ export default {
         this.ios_alarm = false;
       }
     },
-    distance_interval: function() {
+    distance_interval: function () {
       this.intervalid1 = setInterval(
-        function() {
+        function () {
           if (this.am_i_prey && this.game_state == "inprogress") {
             this.axios
               .get(this.server_url + "distance.php", {
                 params: {
                   game: this.game,
                   id: localStorage.key_id,
-                  password: localStorage.password
-                }
+                  password: localStorage.password,
+                },
               })
               .then(this.alarm)
-              .catch(function(error) {
+              .catch(function (error) {
                 // handle error
                 console.log(error);
               })
-              .then(function() {
+              .then(function () {
                 // always executed
               });
           } else {
@@ -1439,17 +1427,17 @@ export default {
         2000
       );
     },
-    startReplay: function() {
+    startReplay: function () {
       this.real_replay_time = parseInt(
         (
           new Date(this.replay_date + "T" + this.replay_time).getTime() / 1000
         ).toFixed(0)
       );
     },
-    stopReplay: function() {
+    stopReplay: function () {
       this.real_replay_time = 0;
     },
-    startGame: function() {
+    startGame: function () {
       var bodyFormData = new FormData();
       bodyFormData.set("game_time", this.game_time);
       bodyFormData.set("waiting_time", this.waiting_time);
@@ -1460,19 +1448,19 @@ export default {
       this.axios
         .post(this.server_url + "send_time.php", bodyFormData)
         .then(
-          function(response) {
+          function (response) {
             // console.log(response);
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    stopGame: function() {
+    stopGame: function () {
       var bodyFormData = new FormData();
       bodyFormData.set("game", localStorage.game);
       bodyFormData.set("password", localStorage.password);
@@ -1480,19 +1468,19 @@ export default {
       this.axios
         .post(this.server_url + "stop_game.php", bodyFormData)
         .then(
-          function(response) {
+          function (response) {
             // console.log(response);
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    get_game_settings: function(response) {
+    get_game_settings: function (response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
       this.game_settings = response.data;
       var remaining_time = 0;
@@ -1536,35 +1524,35 @@ export default {
         this.$refs.game_timer.stopTimer();
       }
     },
-    game_timer_update: function() {
+    game_timer_update: function () {
       this.intervalid1 = setInterval(
-        function() {
+        function () {
           this.axios
             .get(this.server_url + "game_timer_update.php", {
               params: {
                 name: this.game,
                 id: localStorage.key_id,
-                password: localStorage.password
-              }
+                password: localStorage.password,
+              },
             })
             .then(this.get_game_settings)
-            .catch(function(error) {
+            .catch(function (error) {
               // handle error
               console.log(error);
             })
-            .then(function() {
+            .then(function () {
               // always executed
             });
         }.bind(this),
         1000
       );
     },
-    closed_districts: function(response) {
+    closed_districts: function (response) {
       if (this.axiosstop) return; //FIXME: hack for ios13
       //Update districts checkboxes in menu
       this.checked_districts = [];
       response.data.forEach(
-        function(value, key) {
+        function (value, key) {
           this.checked_districts.push(value.district);
         }.bind(this)
       );
@@ -1572,37 +1560,37 @@ export default {
       this.polygons = [];
       //Draw polygon
       this.districts.forEach(
-        function(value, key) {
+        function (value, key) {
           if (this.checked_districts.includes(value.name)) {
             this.polygons.push(value);
           }
         }.bind(this)
       );
     },
-    get_districts: function() {
+    get_districts: function () {
       this.intervalid1 = setInterval(
-        function() {
+        function () {
           this.axios
             .get(this.server_url + "get_districts.php", {
               params: {
                 game: this.game,
                 id: localStorage.key_id,
-                password: localStorage.password
-              }
+                password: localStorage.password,
+              },
             })
             .then(this.closed_districts)
-            .catch(function(error) {
+            .catch(function (error) {
               // handle error
               console.log(error);
             })
-            .then(function() {
+            .then(function () {
               // always executed
             });
         }.bind(this),
         2000
       );
     },
-    update_districts: function(district) {
+    update_districts: function (district) {
       var checked = false;
       if (this.checked_districts.includes(district)) {
         checked = false;
@@ -1618,18 +1606,18 @@ export default {
       //post prey info
       this.axios
         .post(this.server_url + "update_districts.php", bodyFormData)
-        .then(function(response) {
+        .then(function (response) {
           console.log(response);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    update_game_setting: function() {
+    update_game_setting: function () {
       var bodyFormData = new FormData();
       bodyFormData.set("game_type", this.game_settings.game_type);
       bodyFormData.set("radius", this.game_settings.radius);
@@ -1639,16 +1627,16 @@ export default {
       //post new visibility radius
       this.axios
         .post(this.server_url + "game_setup.php", bodyFormData)
-        .then(function(response) {})
-        .catch(function(error) {
+        .then(function (response) {})
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
     },
-    delete_user: function(marker) {
+    delete_user: function (marker) {
       var bodyFormData = new FormData();
       bodyFormData.set("user_id", marker.id);
       bodyFormData.set("game", this.game);
@@ -1658,15 +1646,15 @@ export default {
       this.axios
         .post(this.server_url + "delete_user.php", bodyFormData)
         .then(
-          function(response) {
+          function (response) {
             this.mainMenu("Users");
           }.bind(this)
         )
-        .catch(function(error) {
+        .catch(function (error) {
           // handle error
           console.log(error);
         })
-        .then(function() {
+        .then(function () {
           // always executed
         });
       this.deleteActionSheet = false;
@@ -1674,7 +1662,16 @@ export default {
       this.userSettingsView = false;
       this.usersMenuView = true;
     },
-    screenLock: function() {}
-  }
+    screenLock: function () {},
+    testAlert: function () {
+      alert("Hola");
+      console.log(1111);
+    },
+
+    handleCloseStartDialog: function () {
+      this.dialog = this.showStartScreen = false;
+      this.screenLock();
+    },
+  },
 };
 </script>

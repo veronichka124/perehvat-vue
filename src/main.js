@@ -16,40 +16,24 @@ import modal from "./components/modal-template.vue";
 import ButtonCounter from "./components/button-counter.vue";
 import timer from "./components/timer.vue";
 import MainMap from "./components/map.vue";
+import StartModal from "./components/modals/StartModal";
 import "./style.css";
 
 Vue.use(VueGeolocation);
-Vue.use(VueOnsen); // VueOnsen set here as plugin to VUE. Done automatically if a call to window.Vue exists in the startup code.
+Vue.use(VueOnsen); 
 Vue.use(Vuetify);
 Vue.use(VueAxios, axios);
 Vue.use(VueGoogleMaps, {
   load: {
     key: "AIzaSyDNT2Wv0k6wG9_KdMmfsnfiqeFo6DKb8M4",
     libraries: "geometry" // This is required if you use the Autocomplete plugin
-    // OR: libraries: 'places,drawing'
-    // OR: libraries: 'places,drawing,visualization'
-    // (as you require)
-
-    //// If you want to set the version, you can do so:
-    // v: '3.26',
   }
-
-  //// If you intend to programmatically custom event listener code
-  //// (e.g. `this.$refs.gmap.$on('zoom_changed', someFunc)`)
-  //// instead of going through Vue templates (e.g. `<GmapMap @zoom_changed="someFunc">`)
-  //// you might need to turn this on.
-  // autobindAllEvents: false,
-
-  //// If you want to manually install components, e.g.
-  //// import {GmapMarker} from 'vue2-google-maps/src/components/marker'
-  //// Vue.component('GmapMarker', GmapMarker)
-  //// then disable the following:
-  // installComponents: true,
 });
 Vue.component("modal", modal);
 Vue.component("button-counter", ButtonCounter);
 Vue.component("timer", timer);
 Vue.component("main-map", MainMap);
+Vue.component("start-modal", StartModal);
 
 new Vue({
   el: "#app",
