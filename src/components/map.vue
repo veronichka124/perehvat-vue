@@ -1,102 +1,33 @@
 <template>
   <div id="main-map">
-    <!-- MODAL -->
-    <!-- Start  screen -->
-    <start-modal
-      v-bind:showStartScreen="showStartScreen"
+    <StartModal
+      v-bind:show="showStartScreen"
       v-bind:geolocation_error="geolocation_error"
       @handleShowCreateGameScreen="showCreateGameScreen = true"
       @handleShowJoinGameScreen="showJoinGameScreen = true"
       @handleClose="handleCloseStartDialog"
     />
+    <CreateGameModal
+      v-bind:show="showCreateGameScreen"
+      v-bind:gameExists="gameExists"
+      @handleCreateGame="createGame"
+      @handleClose="dialog = showCreateGameScreen = false"
+    />
+    <JoinGameModal
+      v-bind:show="showJoinGameScreen"
+      v-bind:gameExists="gameExists"
+      @handleJoinGame="joinGame"
+      @handleClose="dialog = showJoinGameScreen = false;
+        gameExists = false;"
+    />
+    <ChangeNameModal    
+      v-bind:show="showChangeNameScreen"
+      @handleChangeName="changeName"
+      @handleClose="dialog = showChangeNameScreen = false"
+    />
+    <GpsErrorModal  v-bind:geolocation_error="geolocation_error"/>
 
-    <!-- Create game  screen -->
-    <modal
-      id="createGameScreen"
-      v-if="showCreateGameScreen"
-      @close="dialog = showCreateGameScreen = false"
-    >
-      <h3 slot="header">Create New Game</h3>
-      <div slot="body" class="text-xs-center">
-        <v-flex xs12 sm6>
-          <v-text-field
-            v-model="newGame"
-            id="newGameName"
-            label="Game name"
-            single-line
-          ></v-text-field>
-        </v-flex>
-        <v-alert :value="gameExists" color="red" icon="warning" outline>
-          Game already exists
-        </v-alert>
-        <!-- add options to select roles? -->
-        <!-- on click create new game -->
-        <v-btn round color="primary" dark @click="createGame"
-          >Create game</v-btn
-        >
-      </div>
-    </modal>
-    <!-- Join game  screen -->
-    <modal
-      id="joinGameScreen"
-      v-if="showJoinGameScreen"
-      @close="
-        dialog = showJoinGameScreen = false;
-        gameExists = false;
-      "
-    >
-      <h3 slot="header">Join Game</h3>
-      <div slot="body" class="text-xs-center">
-        <v-flex xs12 sm6>
-          <v-text-field
-            v-model="newGame"
-            id="joinGameName"
-            label="Game name"
-            single-line
-          ></v-text-field>
-        </v-flex>
-        <v-alert :value="gameExists" color="red" icon="warning" outline>
-          Game does not exist
-        </v-alert>
-        <!-- on click change game to new game name -->
-        <v-btn round color="primary" dark @click="joinGame(newGame)"
-          >Join game</v-btn
-        >
-      </div>
-    </modal>
-    <!-- Change name screen -->
-    <modal
-      id="changeNameScreen"
-      v-if="showChangeNameScreen"
-      @close="dialog = showChangeNameScreen = false"
-    >
-      <h3 slot="header">Enter name</h3>
-      <div slot="body" class="text-xs-center">
-        <v-flex xs12 sm6>
-          <v-text-field
-            v-model="newName"
-            id="changeName"
-            label="Your name"
-            single-line
-          ></v-text-field>
-        </v-flex>
-        <!-- on click change name to new -->
-        <v-btn round color="primary" dark @click="changeName">Save</v-btn>
-      </div>
-    </modal>
-    <!-- GPS Error -->
-    <modal id="gpsError" v-if="geolocation_error">
-      <h3 slot="header" class="gps_error">GPS ERROR</h3>
-      <div slot="body" class="gps_error">
-        <span
-          >1) Включите GPS <br />
-          2) Настройте GPS для браузера в настройках телефона. <br />
-          3) Разрешите браузеру использовать геолокацию для этого сайта. <br />
-          4) Обновите страницу
-        </span>
-      </div>
-    </modal>
-    <!-- END MODAL -->
+    <!-- DISTANCE BOX -->
     <v-ons-page>
       <div class="hunter-is-close" v-show="ios_alarm"></div>
       <div
@@ -221,7 +152,7 @@
               tappable
             >
               <div class="left">Name</div>
-              <div class="right">{{ newName }}</div>
+              <div class="right">{{ name }}</div>
             </v-ons-list-item>
             <v-ons-list-item
               @click="dialog = showStartScreen = true"
@@ -641,9 +572,21 @@ import {
   jelgavaDistrict,
 } from "../constants/districts.js";
 import { server_url } from "../constants/server";
+import StartModal from "./modals/StartModal"
+import CreateGameModal from "./modals/CreateGameModal"
+import JoinGameModal from "./modals/JoinGameModal"
+import GpsErrorModal from "./modals/GpsErrorModal"
+import ChangeNameModal from "./modals/ChangeNameModal"
 
 export default {
   name: "main-map",
+  components: {
+    StartModal,
+    CreateGameModal,
+    JoinGameModal,
+    GpsErrorModal,
+    ChangeNameModal,
+  },
   data() {
     return {
       axiosstop: false,
@@ -666,7 +609,6 @@ export default {
       blocked_users: [],
       users: [],
       drawer: null,
-      newName: "",
       mainMenuView: true,
       current_menu: "",
       nameMenuView: false,
@@ -816,12 +758,9 @@ export default {
     }
     if (localStorage.key_id) {
       this.key = localStorage.key_id;
-      // console.log(localStorage.key_id);
     } else {
       localStorage.key_id = this.uuidv4();
       localStorage.password = this.uuidv4();
-      // console.log('id: '+localStorage.key_id);
-      // console.log('password: '+localStorage.key_id);
       this.key = localStorage.key_id;
     }
 
@@ -830,7 +769,6 @@ export default {
 
     if (localStorage.name) {
       this.name = localStorage.name;
-      this.newName = localStorage.name;
     } else {
       localStorage.name = "new player";
       this.name = localStorage.name;
@@ -867,10 +805,10 @@ export default {
     document.dispatchEvent(new Event("render-event"));
   },
   methods: {
-    createGame: function () {
+    createGame: function (gameName) {
       var bodyFormData = new FormData();
       bodyFormData.set("creator", this.key);
-      bodyFormData.set("name", this.newGame);
+      bodyFormData.set("name", gameName);
       bodyFormData.set("id", localStorage.key_id);
       bodyFormData.set("password", localStorage.password);
       this.axios
@@ -880,7 +818,7 @@ export default {
             // console.log(response);
             if (response.data == true) {
               //join game
-              this.joinGame(this.newGame);
+              this.joinGame(gameName);
               this.showCreateGameScreen = false;
               this.dialog = false;
               this.showStartScreen = false;
@@ -1230,25 +1168,21 @@ export default {
           // always executed
         });
     },
-    changeName: function () {
-      localStorage.name = this.newName;
-      // console.log(localStorage.name);
-      this.name = localStorage.name;
+    changeName: function (newName) {
       var bodyFormData = new FormData();
       bodyFormData.set("id", this.key);
-      bodyFormData.set("user_name", localStorage.name);
+      bodyFormData.set("user_name", newName);
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_name.php", bodyFormData)
-        .then(function (response) {
-          // console.log(response);
-        })
+        .then(function () {
+          localStorage.name = newName;
+          this.name = localStorage.name;
+        }.bind(this))
         .catch(function (error) {
-          // handle error
           console.log(error);
         })
         .then(function () {
-          // always executed
         });
       this.showChangeNameScreen = false;
       this.dialog = false;

@@ -1,7 +1,7 @@
 <template>
   <modal
     id="startScreen"
-    v-if="showStartScreen && !geolocation_error"
+    v-if="show && !geolocation_error"
     @close="$emit('handleClose')"
   >
     <h3 slot="header">Welcome!</h3>
@@ -27,10 +27,10 @@
 </template>
 
 <script>
-const startModal = {
+export default {
   name: "StartModal",
   props: {
-    showStartScreen: Boolean,
+    show: Boolean,
     geolocation_error: Boolean,
     handleShowCreateGameScreen: Function,
     handleShowJoinGameScreen: Function,
@@ -40,5 +40,4 @@ const startModal = {
     return {};
   },
 };
-export default startModal;
 </script>
