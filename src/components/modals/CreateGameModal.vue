@@ -1,5 +1,5 @@
 <template>
-      <modal
+    <modal
       id="createGameScreen"
       v-if="show"
       @close="$emit('handleClose')"
@@ -20,7 +20,7 @@
         <!-- on click create new game -->
         <v-btn round color="primary" dark @click="$emit('handleCreateGame', gameName)">
             Create game
-            </v-btn>
+        </v-btn>
       </div>
     </modal>
   </template>
@@ -29,7 +29,7 @@
   export default {
     name: "CreateGameModal",
     props: {
-        show: Boolean,
+      show: Boolean,
       gameExists: Boolean,
       handleCreateGame: Function,
       handleClose: Function,
