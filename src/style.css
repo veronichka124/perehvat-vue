@@ -25,6 +25,13 @@ nav {
   flex-direction: column;
 }
 
+#app button:disabled,
+#app button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc!important;
+  color: #666666!important;
+}
+
 .material-icons {
   font-size: 30px;
 }
