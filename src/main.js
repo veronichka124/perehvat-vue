@@ -16,6 +16,8 @@ import modal from "./components/modal-template.vue";
 import ButtonCounter from "./components/button-counter.vue";
 import timer from "./components/timer.vue";
 import MainMap from "./components/map.vue";
+import OfflineMap from "./components/offline-map.vue";
+
 import "./style.css";
 
 Vue.use(VueGeolocation);
@@ -32,6 +34,7 @@ Vue.component("modal", modal);
 Vue.component("button-counter", ButtonCounter);
 Vue.component("timer", timer);
 Vue.component("main-map", MainMap);
+Vue.component("offline-map", OfflineMap);
 
 new Vue({
   el: "#app",
