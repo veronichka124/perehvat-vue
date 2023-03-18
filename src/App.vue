@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <div v-if="isMapVisible"><main-map /></div>
+    <div v-else><offline-map /></div>
   </div>
 </template>
 

@@ -25,6 +25,13 @@ nav {
   flex-direction: column;
 }
 
+#app button:disabled,
+#app button[disabled]{
+  border: 1px solid #999999;
+  background-color: #cccccc!important;
+  color: #666666!important;
+}
+
 .material-icons {
   font-size: 30px;
 }
@@ -195,6 +202,44 @@ div.game_waiting #timer_on {
 .red_list_item {
   background-color: #f89c96;
 }
+
+#map_screenshot { 
+  background-image: url(assets/map.png);
+  position: fixed;
+  background-size: cover;
+  height: 100%;
+  width: 100%;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #000;
+  opacity: 0.7;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+.dialog {
+  z-index: 101;
+  background-color: #fff;
+  min-height: unset;
+  padding: 20px;
+  border-radius: 5px;
+}
+
+.dialog > h6 {
+  color: #000;
+  font-weight: 400;
+  text-align: center;
+}
+
+h6 {
+  font-size: 14px;
+}
+
 
 @-webkit-keyframes pulse {
   0% {
