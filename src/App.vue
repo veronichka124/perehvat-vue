@@ -1,14 +1,19 @@
 <template>
   <div id="app">
-    <div v-if="isMapVisible"><main-map /></div>
+    <div v-if="isMapVisible"><Routes /></div>
     <div v-else><offline-map /></div>
   </div>
 </template>
 
 <script>
 import { server_url } from "./constants/server";
+import Routes from "./Routes";
+
 export default {
   name: "app",
+  components: {
+    Routes,
+  },
   data() {
     return {
       isMapVisible: false,
