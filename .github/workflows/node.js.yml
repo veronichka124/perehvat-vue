@@ -37,4 +37,4 @@ jobs:
         password: ${{ secrets.PASSWORD }}
         port: ${{ secrets.PORT }}
         source: "dist,index.html,alarm1.mp3"
-        target: "/var/www/html/igra2/"
+        target: "/var/www/html/igra/"
