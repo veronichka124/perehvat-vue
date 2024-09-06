@@ -12,6 +12,7 @@
             id="changeName"
             label="Your name"
             single-line
+            autocomplete="off"
           />
         </v-flex>
         <v-btn 

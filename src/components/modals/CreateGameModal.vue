@@ -12,6 +12,7 @@
             id="newGameName"
             label="Game name"
             single-line
+            autocomplete="off"
           ></v-text-field>
         </v-flex>
         <v-alert :value="gameExists" color="red" icon="warning" outline>
