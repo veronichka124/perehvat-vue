@@ -17,15 +17,17 @@
       v-bind:show="showJoinGameScreen"
       v-bind:gameExists="gameExists"
       @handleJoinGame="joinGame"
-      @handleClose="dialog = showJoinGameScreen = false;
-        gameExists = false;"
+      @handleClose="
+        dialog = showJoinGameScreen = false;
+        gameExists = false;
+      "
     />
-    <ChangeNameModal    
+    <ChangeNameModal
       v-bind:show="showChangeNameScreen"
       @handleChangeName="changeName"
       @handleClose="dialog = showChangeNameScreen = false"
     />
-    <GpsErrorModal  v-bind:geolocation_error="geolocation_error"/>
+    <GpsErrorModal v-bind:geolocation_error="geolocation_error" />
 
     <!-- DISTANCE BOX -->
     <v-ons-page>
@@ -572,11 +574,11 @@ import {
   jelgavaDistrict,
 } from "../constants/districts.js";
 import { server_url } from "../constants/server";
-import StartModal from "./modals/StartModal"
-import CreateGameModal from "./modals/CreateGameModal"
-import JoinGameModal from "./modals/JoinGameModal"
-import GpsErrorModal from "./modals/GpsErrorModal"
-import ChangeNameModal from "./modals/ChangeNameModal"
+import StartModal from "./modals/StartModal";
+import CreateGameModal from "./modals/CreateGameModal";
+import JoinGameModal from "./modals/JoinGameModal";
+import GpsErrorModal from "./modals/GpsErrorModal";
+import ChangeNameModal from "./modals/ChangeNameModal";
 
 export default {
   name: "main-map",
@@ -1175,15 +1177,16 @@ export default {
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_name.php", bodyFormData)
-        .then(function () {
-          localStorage.name = newName;
-          this.name = localStorage.name;
-        }.bind(this))
+        .then(
+          function () {
+            localStorage.name = newName;
+            this.name = localStorage.name;
+          }.bind(this)
+        )
         .catch(function (error) {
           console.log(error);
         })
-        .then(function () {
-        });
+        .then(function () {});
       this.showChangeNameScreen = false;
       this.dialog = false;
     },

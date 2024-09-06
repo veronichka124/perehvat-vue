@@ -12,22 +12,22 @@ export default {
   data() {
     return {
       isMapVisible: false,
-      server_url: server_url
+      server_url: server_url,
     };
   },
-  mounted: function() {
+  mounted: function () {
     this.getMapSettings();
   },
   methods: {
-    getMapSettings: function() {
+    getMapSettings: function () {
       this.axios
         .get(this.server_url + "settings.php")
-        .then(res => {
+        .then((res) => {
           const { map_visible } = res.data;
           this.isMapVisible = !!Number(map_visible);
         })
-        .catch(err => console.log(err));
-    }
-  }
+        .catch((err) => console.log(err));
+    },
+  },
 };
 </script>
