@@ -7,7 +7,7 @@ module.exports = {
   entry: "./src/main.js",
   output: {
     path: path.resolve(__dirname, "./dist"),
-    publicPath: "dist/",
+    publicPath: "/dist/",
     filename: "build.js",
   },
   module: {
@@ -64,7 +64,7 @@ module.exports = {
   plugins: [
     // make sure to include the plugin for the magic
     new VueLoaderPlugin(),
-    new HtmlWebpackPlugin({ template: "./index.html" }),
+    new HtmlWebpackPlugin({ template: "index.html" }),
   ],
 };
 
