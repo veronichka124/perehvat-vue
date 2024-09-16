@@ -206,12 +206,11 @@ div.game_waiting #timer_on {
   background-color: #f89c96;
 }
 
-#map_screenshot {
-  background-image: url(assets/map.png);
+.map_screenshot {
   position: fixed;
-  background-size: cover;
   height: 100%;
   width: 100%;
+  object-fit: cover;
 }
 
 .overlay {
