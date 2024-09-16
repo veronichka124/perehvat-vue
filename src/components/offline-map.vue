@@ -12,9 +12,7 @@
 export default {
   name: "offline-map",
   data() {
-    return {
-      count: 0,
-    };
+    return {};
   },
 };
 </script>
