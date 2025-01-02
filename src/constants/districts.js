@@ -11,6 +11,7 @@ export const DistrictNames = [
   "Salamandra",
   "Jugla",
   "Ozolciema",
+  "Bergi",
 ];
 
 export const Districts = [
@@ -44,6 +45,9 @@ export const Districts = [
       { lat: 56.997762, lng: 24.244033 },
       { lat: 57.000925, lng: 24.223214 },
       { lat: 57.034226, lng: 24.139032 },
+      { lat: 57.036755, lng: 24.128332 },
+      { lat: 57.035053, lng: 24.117992 },
+      { lat: 57.038592, lng: 24.108507 },
       { lat: 57.040762, lng: 24.112339 },
       { lat: 57.045639, lng: 24.119114 },
       { lat: 57.052075, lng: 24.129704 },
@@ -65,7 +69,7 @@ export const Districts = [
       { lat: 57.041509, lng: 24.103368 },
       { lat: 57.036875, lng: 24.111955 },
       { lat: 57.034596, lng: 24.120253 },
-      { lat: 57.034124, lng: 24.126892 },
+      { lat: 57.034013, lng: 24.12685 },
       { lat: 57.033812, lng: 24.127616 },
     ],
   },
@@ -197,6 +201,16 @@ export const Districts = [
       { lng: 24.07801, lat: 56.89565 },
       { lng: 24.09152, lat: 56.89752 },
       { lng: 24.1096, lat: 56.90154 },
+    ],
+  },
+  {
+    name: "Bergi",
+    points: [
+      { lng: 24.257784, lat: 57.00039 },
+      { lng: 24.314008, lat: 57.016818 },
+      { lng: 24.326949, lat: 56.969195 },
+      { lng: 24.257057, lat: 56.957573 },
+      { lng: 24.255865, lat: 56.9819 },
     ],
   },
 ];
