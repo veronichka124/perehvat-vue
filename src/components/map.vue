@@ -93,6 +93,7 @@
         <users-menu-view
           v-if="usersMenuView"
           :users="users"
+          :markers="markers"
           :blocked_users_count="Object.keys(blocked_users).length"
           :am_i_admin="am_i_admin"
           :mainMenu="mainMenu"

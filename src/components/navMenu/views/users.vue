@@ -14,6 +14,9 @@
       >
         <div class="left">
           {{ marker.user_name }} (id: {{ marker.id.substr(0, 4) }})
+          <span style="padding-left: 4px; color: #940075">{{
+            showSpeed(marker.id)
+          }}</span>
         </div>
       </v-ons-list-item>
     </v-ons-list>
@@ -43,6 +46,10 @@ export default {
       type: Object | Array,
       required: true,
     },
+    markers: {
+      type: Object | Array,
+      required: true,
+    },
     am_i_admin: {
       type: Boolean,
       required: true,
@@ -53,6 +60,19 @@ export default {
     },
     mainMenu: Function,
     userSettings: Function,
+  },
+  methods: {
+    showSpeed(user_id) {
+      const userKey = Object.keys(this.markers).find(
+        (key) => this.markers[key].id === user_id
+      );
+      if (userKey) {
+        const user = this.markers[userKey];
+        const speed = Number(user.speed).toFixed(0);
+        return `${speed} km/h`;
+      }
+      return "";
+    },
   },
 };
 </script>
