@@ -17,18 +17,20 @@
       v-bind:show="showJoinGameScreen"
       v-bind:gameExists="gameExists"
       @handleJoinGame="joinGame"
-      @handleClose="dialog = showJoinGameScreen = false;
-        gameExists = false;"
+      @handleClose="
+        dialog = showJoinGameScreen = false;
+        gameExists = false;
+      "
     />
-    <ChangeNameModal    
+    <ChangeNameModal
       v-bind:show="showChangeNameScreen"
       @handleChangeName="changeName"
       @handleClose="dialog = showChangeNameScreen = false"
     />
-    <GpsErrorModal  v-bind:geolocation_error="geolocation_error"/>
+    <GpsErrorModal v-bind:geolocation_error="geolocation_error" />
 
-    <!-- DISTANCE BOX -->
     <v-ons-page>
+      <!-- DISTANCE BOX -->
       <div class="hunter-is-close" v-show="ios_alarm"></div>
       <div
         v-bind:class="{
@@ -51,13 +53,7 @@
 
       <!-- MENU DRAWER -->
       <!-- Toggle button -->
-      <v-container>
-        <v-layout>
-          <v-btn color="teal lighten-1" fab dark @click.stop="drawer = !drawer">
-            <v-icon dark>list</v-icon>
-          </v-btn>
-        </v-layout>
-      </v-container>
+      <menu-toggle-button :toggleMenuDrawer="toggleMenuDrawer" />
       <!-- Side menu -->
       <v-navigation-drawer
         class="grey lighten-3"
@@ -80,140 +76,28 @@
           <v-spacer></v-spacer>
         </v-toolbar>
 
-        <v-ons-list v-if="mainMenuView">
-          <v-ons-list-item tappable>
-            <div class="left">
-              <v-ons-icon
-                v-if="am_i_admin"
-                icon="fa-crown"
-                class="list-item__icon icon-admin"
-              ></v-ons-icon>
-              <v-ons-icon
-                v-else
-                icon="fa-car"
-                class="list-item__icon icon-width"
-              ></v-ons-icon>
-            </div>
-            <div class="center" @click="mainMenu('Profile')">
-              <span class="list-item__title">{{ name }}</span>
-              <span v-if="am_i_prey" class="list-item__subtitle">Угонщик</span>
-              <span v-else class="list-item__subtitle">Охотник</span>
-            </div>
-          </v-ons-list-item>
-        </v-ons-list>
-
-        <div v-if="mainMenuView" id="mainMenuView">
-          <v-ons-list v-if="am_i_admin">
-            <v-ons-list-item
-              @click="mainMenu(item.title)"
-              v-for="(item, index) in admin_menu"
-              :key="index"
-              modifier="longdivider"
-              tappable
-            >
-              <div class="left">
-                <v-ons-icon
-                  :icon="item.icon"
-                  class="list-item__icon icon-width"
-                ></v-ons-icon>
-              </div>
-              <div class="center">
-                {{ item.title }}
-              </div>
-            </v-ons-list-item>
-          </v-ons-list>
-          <v-ons-list v-else>
-            <v-ons-list-item
-              @click="mainMenu(item.title)"
-              v-for="(item, index) in user_menu"
-              :key="index"
-              modifier="longdivider"
-              tappable
-            >
-              <div class="left">
-                <v-ons-icon
-                  :icon="item.icon"
-                  class="list-item__icon icon-width"
-                ></v-ons-icon>
-              </div>
-              <div class="center">
-                {{ item.title }}
-              </div>
-            </v-ons-list-item>
-          </v-ons-list>
-        </div>
-        <!-- PROFILE MENU VIEW -->
-        <div id="nameMenuView" v-if="nameMenuView">
-          <v-ons-list>
-            <v-ons-list-header>Game and team name</v-ons-list-header>
-            <v-ons-list-item
-              modifier="chevron longdivider"
-              @click="dialog = showChangeNameScreen = true"
-              tappable
-            >
-              <div class="left">Name</div>
-              <div class="right">{{ name }}</div>
-            </v-ons-list-item>
-            <v-ons-list-item
-              @click="dialog = showStartScreen = true"
-              modifier="chevron longdivider"
-              tappable
-            >
-              <div class="left">Game</div>
-              <div class="right">{{ game }}</div>
-            </v-ons-list-item>
-            <v-ons-list-header>Marker color</v-ons-list-header>
-            <v-ons-list-item>
-              <div class="center">
-                <v-ons-select style="width: 100%" v-model="marker_color">
-                  <option
-                    v-bind:key="index"
-                    v-for="(color, index) in colors"
-                    :value="index"
-                  >
-                    {{ color.name }}
-                  </option>
-                </v-ons-select>
-              </div>
-            </v-ons-list-item>
-          </v-ons-list>
-        </div>
-
-        <!-- USERS MENU VIEW -->
-        <div id="usersMenuView" v-if="usersMenuView">
-          <v-ons-list-header>
-            Game users ({{ Object.keys(users).length }})
-          </v-ons-list-header>
-          <v-ons-list v-for="(marker, index) in users" :key="index">
-            <v-ons-list-item
-              v-bind:class="{ red_list_item: marker.is_prey == 1 }"
-              tappable
-              modifier="chevron longdivider"
-              @click="userSettings(marker)"
-            >
-              <div class="left">
-                {{ marker.user_name }} (id: {{ marker.id.substr(0, 4) }})
-              </div>
-            </v-ons-list-item>
-          </v-ons-list>
-
-          <div v-if="am_i_admin">
-            <v-ons-list-header>
-              Unconfirmed users in this game ({{
-                Object.keys(blocked_users).length
-              }})
-            </v-ons-list-header>
-            <v-ons-list>
-              <v-ons-list-item
-                tappable
-                modifier="chevron"
-                @click="mainMenu('Blocked users')"
-              >
-                <div class="left">Unconfirmed users</div>
-              </v-ons-list-item>
-            </v-ons-list>
-          </div>
-        </div>
+        <main-menu-view
+          v-if="mainMenuView"
+          :am_i_admin="am_i_admin"
+          :name="name"
+          :mainMenu="mainMenu"
+          :am_i_prey="am_i_prey"
+        />
+        <profile-menu-view
+          v-if="nameMenuView"
+          :name="name"
+          :game="game"
+          @handleNameClick="() => (dialog = showChangeNameScreen = true)"
+          @handleGameClick="() => (dialog = showStartScreen = true)"
+        />
+        <users-menu-view
+          v-if="usersMenuView"
+          :users="users"
+          :blocked_users_count="Object.keys(blocked_users).length"
+          :am_i_admin="am_i_admin"
+          :mainMenu="mainMenu"
+          :userSettings="userSettings"
+        />
 
         <!-- BLOCKED USERS MENU VIEW -->
         <div id="blockedUsersView" v-if="blockedUsersView">
@@ -572,11 +456,16 @@ import {
   jelgavaDistrict,
 } from "../constants/districts.js";
 import { server_url } from "../constants/server";
-import StartModal from "./modals/StartModal"
-import CreateGameModal from "./modals/CreateGameModal"
-import JoinGameModal from "./modals/JoinGameModal"
-import GpsErrorModal from "./modals/GpsErrorModal"
-import ChangeNameModal from "./modals/ChangeNameModal"
+import StartModal from "./modals/StartModal";
+import CreateGameModal from "./modals/CreateGameModal";
+import JoinGameModal from "./modals/JoinGameModal";
+import GpsErrorModal from "./modals/GpsErrorModal";
+import ChangeNameModal from "./modals/ChangeNameModal";
+import navMenu from "./navMenu/NavMenu";
+import menuToggleButton from "./navMenu/toggleBtn";
+import mainMenuView from "./navMenu/views/main";
+import profileMenuView from "./navMenu/views/profile";
+import usersMenuView from "./navMenu/views/users";
 
 export default {
   name: "main-map",
@@ -586,13 +475,17 @@ export default {
     JoinGameModal,
     GpsErrorModal,
     ChangeNameModal,
+    navMenu,
+    menuToggleButton,
+    mainMenuView,
+    profileMenuView,
+    usersMenuView,
   },
   data() {
     return {
       axiosstop: false,
       car: CarIcon,
       colors: colors,
-      marker_color: 0,
       polygons: [],
       checked_districts: [],
       district_names: DistrictNames,
@@ -633,15 +526,6 @@ export default {
       selectedUserId: "",
       toHide: false,
       hideNameInput: true,
-      admin_menu: [
-        { title: "Profile", icon: "user" },
-        { title: "Users", icon: "users" },
-        { title: "Game settings", icon: "cog" },
-      ],
-      user_menu: [
-        { title: "Profile", icon: "user" },
-        { title: "Users", icon: "users" },
-      ],
       show: false,
       menu: false,
       admins: [],
@@ -779,10 +663,6 @@ export default {
       this.newGame = localStorage.game;
     }
 
-    if (!isNaN(localStorage.color)) {
-      this.marker_color = localStorage.color;
-    }
-
     this.distance_interval();
     this.get_admins();
     this.get_districts();
@@ -914,6 +794,7 @@ export default {
       }
     },
     fetch_blocked_users: function () {
+      if (!this.am_i_admin) return;
       this.axios
         .get(this.server_url + "blocked_users.php", {
           params: {
@@ -1140,7 +1021,6 @@ export default {
     },
     geo_update: function (pos) {
       this.geolocation_error = false;
-      localStorage.color = this.marker_color;
       this.pos = pos;
       var crd = pos.coords;
       // console.log(crd);
@@ -1153,7 +1033,7 @@ export default {
       bodyFormData.set("speed", speed);
       bodyFormData.set("accuracy", crd.accuracy);
       bodyFormData.set("game", this.game);
-      bodyFormData.set("color", this.marker_color);
+      bodyFormData.set("color", localStorage.color);
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_location.php", bodyFormData)
@@ -1175,15 +1055,16 @@ export default {
       bodyFormData.set("password", localStorage.password);
       this.axios
         .post(this.server_url + "update_name.php", bodyFormData)
-        .then(function () {
-          localStorage.name = newName;
-          this.name = localStorage.name;
-        }.bind(this))
+        .then(
+          function () {
+            localStorage.name = newName;
+            this.name = localStorage.name;
+          }.bind(this)
+        )
         .catch(function (error) {
           console.log(error);
         })
-        .then(function () {
-        });
+        .then(function () {});
       this.showChangeNameScreen = false;
       this.dialog = false;
     },
@@ -1605,6 +1486,9 @@ export default {
     handleCloseStartDialog: function () {
       this.dialog = this.showStartScreen = false;
       this.screenLock();
+    },
+    toggleMenuDrawer: function () {
+      this.drawer = !this.drawer;
     },
   },
 };

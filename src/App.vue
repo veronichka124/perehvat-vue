@@ -1,33 +1,23 @@
 <template>
   <div id="app">
-    <div v-if="isMapVisible"><main-map /></div>
-    <div v-else><offline-map /></div>
+    <main-map v-if="isMapVisible" />
+    <offline-map v-else />
   </div>
 </template>
 
 <script>
-import { server_url } from "./constants/server";
+import { MapSettingsMixin } from "./mixins/MapSettingsMixin";
+
 export default {
   name: "app",
+  mixins: [MapSettingsMixin],
   data() {
     return {
       isMapVisible: false,
-      server_url: server_url
     };
   },
-  mounted: function() {
+  created() {
     this.getMapSettings();
   },
-  methods: {
-    getMapSettings: function() {
-      this.axios
-        .get(this.server_url + "settings.php")
-        .then(res => {
-          const { map_visible } = res.data;
-          this.isMapVisible = !!Number(map_visible);
-        })
-        .catch(err => console.log(err));
-    }
-  }
 };
 </script>
