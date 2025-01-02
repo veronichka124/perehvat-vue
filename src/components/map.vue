@@ -461,7 +461,6 @@ import CreateGameModal from "./modals/CreateGameModal";
 import JoinGameModal from "./modals/JoinGameModal";
 import GpsErrorModal from "./modals/GpsErrorModal";
 import ChangeNameModal from "./modals/ChangeNameModal";
-import navMenu from "./navMenu/NavMenu";
 import menuToggleButton from "./navMenu/toggleBtn";
 import mainMenuView from "./navMenu/views/main";
 import profileMenuView from "./navMenu/views/profile";
@@ -475,7 +474,6 @@ export default {
     JoinGameModal,
     GpsErrorModal,
     ChangeNameModal,
-    navMenu,
     menuToggleButton,
     mainMenuView,
     profileMenuView,
