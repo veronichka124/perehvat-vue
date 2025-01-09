@@ -5,18 +5,29 @@
       Game users ({{ Object.keys(users).length }})
     </v-ons-list-header>
 
-    <v-ons-list v-for="(marker, index) in users" :key="index">
+    <v-ons-list :class="{ notAdmin: !am_i_admin }">
       <v-ons-list-item
-        v-bind:class="{ red_list_item: marker.is_prey == 1 }"
+        v-for="(marker, index) in users"
+        :key="index"
+        v-bind:class="{
+          isPrey: marker.is_prey == 1,
+          notActive: isNotActive(marker),
+        }"
         tappable
         modifier="chevron longdivider"
         @click="userSettings(marker)"
       >
-        <div class="left">
+        <div class="listItemContent">
           {{ marker.user_name }} (id: {{ marker.id.substr(0, 4) }})
-          <span style="padding-left: 4px; color: #940075">{{
-            showSpeed(marker.id)
-          }}</span>
+          <span
+            v-if="!marker.is_prey"
+            v-bind:class="{
+              userActivityInfo: true,
+              notActive: isNotActive(marker),
+              speed: !isNotActive(marker),
+            }"
+            >{{ showSpeed(marker.id) }}</span
+          >
         </div>
       </v-ons-list-item>
     </v-ons-list>
@@ -39,8 +50,10 @@
 </template>
 
 <script>
+import { helpers } from "../../../mixins/helpers";
 export default {
   name: "menu-users-view",
+  mixins: [helpers],
   props: {
     users: {
       type: Object | Array,
@@ -62,17 +75,58 @@ export default {
     userSettings: Function,
   },
   methods: {
-    showSpeed(user_id) {
-      const userKey = Object.keys(this.markers).find(
+    getUserMarker(user_id) {
+      const key = Object.keys(this.markers).find(
         (key) => this.markers[key].id === user_id
       );
-      if (userKey) {
-        const user = this.markers[userKey];
+      return this.markers[key];
+    },
+    showSpeed(user_id) {
+      const user = this.getUserMarker(user_id);
+      if (user) {
+        if (user.last_activity > 6) {
+          const markerAge = this.parseMarkerAge(user.last_activity);
+          return `${markerAge} ago`;
+        }
+
         const speed = Number(user.speed).toFixed(0);
         return `${speed} km/h`;
       }
       return "";
     },
+    isNotActive(user) {
+      const userLastActivity = this.getUserMarker(user.id)?.last_activity;
+      return userLastActivity > 6 && !user.is_prey;
+    },
   },
 };
 </script>
+
+<style scoped>
+.isPrey {
+  background-color: #f89c96;
+}
+.userActivityInfo {
+  padding-left: 4px;
+}
+.notActive {
+  color: #9d9d9d;
+}
+.speed {
+  color: #940075;
+}
+.listItemContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding-right: 30px;
+}
+.notAdmin > .list-item--chevron:before {
+  display: none;
+}
+
+.notAdmin .listItemContent {
+  padding-right: 15px;
+}
+</style>

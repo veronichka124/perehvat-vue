@@ -202,10 +202,6 @@ div.game_waiting #timer_on {
   animation: pulse 1s infinite;
 }
 
-.red_list_item {
-  background-color: #f89c96;
-}
-
 .map_screenshot {
   position: fixed;
   height: 100%;

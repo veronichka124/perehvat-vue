@@ -411,9 +411,9 @@
             /></span>
             <span class="info-box-subtitle">{{ marker.speed }} km/h</span>
             <br />
-            <span class="info-box-subtitle"
-              >{{ marker.last_activity }} ago</span
-            >
+            <span class="info-box-subtitle">
+              {{ parseMarkerAge(marker.last_activity) }} ago
+            </span>
           </div>
         </GmapInfoWindow>
 
@@ -457,6 +457,7 @@ import {
   jelgavaDistrict,
 } from "../constants/districts.js";
 import { server_url } from "../constants/server";
+import { helpers } from "../mixins/helpers.js";
 import StartModal from "./modals/StartModal";
 import CreateGameModal from "./modals/CreateGameModal";
 import JoinGameModal from "./modals/JoinGameModal";
@@ -480,6 +481,7 @@ export default {
     profileMenuView,
     usersMenuView,
   },
+  mixins: [helpers],
   data() {
     return {
       axiosstop: false,
@@ -1148,12 +1150,6 @@ export default {
           fillColor: color,
           rotation: heading,
         };
-        // last marker update
-        if (parseInt(value.last_activity) < 60) {
-          value.last_activity = value.last_activity.toFixed(0) + " sec";
-        } else {
-          value.last_activity = (value.last_activity / 60).toFixed(0) + " min";
-        }
 
         if (value.is_prey == "1") {
           if (value.id == localStorage.key_id) {
