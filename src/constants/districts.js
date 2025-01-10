@@ -10,7 +10,8 @@ export const DistrictNames = [
   "Mežaparks",
   "Salamandra",
   "Jugla",
-  "Ozolciema"
+  "Ozolciema",
+  "Bergi",
 ];
 
 export const Districts = [
@@ -33,8 +34,8 @@ export const Districts = [
       { lat: 57.020693, lng: 24.08608 },
       { lat: 57.003306, lng: 24.088321 },
       { lat: 56.977504, lng: 24.086073 },
-      { lat: 56.975281, lng: 24.076582 }
-    ]
+      { lat: 56.975281, lng: 24.076582 },
+    ],
   },
   {
     name: "Jaunciems",
@@ -44,12 +45,15 @@ export const Districts = [
       { lat: 56.997762, lng: 24.244033 },
       { lat: 57.000925, lng: 24.223214 },
       { lat: 57.034226, lng: 24.139032 },
+      { lat: 57.036755, lng: 24.128332 },
+      { lat: 57.035053, lng: 24.117992 },
+      { lat: 57.038592, lng: 24.108507 },
       { lat: 57.040762, lng: 24.112339 },
       { lat: 57.045639, lng: 24.119114 },
       { lat: 57.052075, lng: 24.129704 },
       { lat: 57.052542, lng: 24.169007 },
-      { lat: 57.013551, lng: 24.236209 }
-    ]
+      { lat: 57.013551, lng: 24.236209 },
+    ],
   },
   {
     name: "Vecmilgrāvis",
@@ -65,9 +69,9 @@ export const Districts = [
       { lat: 57.041509, lng: 24.103368 },
       { lat: 57.036875, lng: 24.111955 },
       { lat: 57.034596, lng: 24.120253 },
-      { lat: 57.034124, lng: 24.126892 },
-      { lat: 57.033812, lng: 24.127616 }
-    ]
+      { lat: 57.034013, lng: 24.12685 },
+      { lat: 57.033812, lng: 24.127616 },
+    ],
   },
   {
     name: "Dārziņi",
@@ -79,8 +83,8 @@ export const Districts = [
       { lat: 56.859483, lng: 24.267146 },
       { lat: 56.861406, lng: 24.261481 },
       { lat: 56.872616, lng: 24.243191 },
-      { lat: 56.88003, lng: 24.250741 }
-    ]
+      { lat: 56.88003, lng: 24.250741 },
+    ],
   },
   {
     name: "Kreisā puse",
@@ -95,8 +99,8 @@ export const Districts = [
       { lat: 56.902079, lng: 24.131134 },
       { lat: 56.886821, lng: 24.072454 },
       { lat: 57.011406, lng: 23.937354 },
-      { lat: 57.031944, lng: 23.988401 }
-    ]
+      { lat: 57.031944, lng: 23.988401 },
+    ],
   },
   {
     name: "Labā puse",
@@ -129,8 +133,8 @@ export const Districts = [
       { lng: 24.24826, lat: 56.93479 },
       { lng: 24.26177, lat: 56.98443 },
       { lng: 24.19574, lat: 57.03368 },
-      { lng: 24.1328, lat: 57.08595 }
-    ]
+      { lng: 24.1328, lat: 57.08595 },
+    ],
   },
   {
     name: "Kengarags",
@@ -139,8 +143,8 @@ export const Districts = [
       { lng: 24.1767, lat: 56.92577 },
       { lng: 24.19121, lat: 56.91444 },
       { lng: 24.2279, lat: 56.896 },
-      { lng: 24.22165, lat: 56.89219 }
-    ]
+      { lng: 24.22165, lat: 56.89219 },
+    ],
   },
   {
     name: "Sarkandaugava",
@@ -152,8 +156,8 @@ export const Districts = [
       { lng: 24.13208, lat: 57.01434 },
       { lng: 24.14134, lat: 57.02924 },
       { lng: 24.13437, lat: 57.03281 },
-      { lng: 24.11417, lat: 57.02207 }
-    ]
+      { lng: 24.11417, lat: 57.02207 },
+    ],
   },
   {
     name: "Mežaparks",
@@ -163,8 +167,8 @@ export const Districts = [
       { lng: 24.17241, lat: 57.00237 },
       { lng: 24.17301, lat: 56.9963 },
       { lng: 24.14969, lat: 56.98322 },
-      { lng: 24.14285, lat: 56.98158 }
-    ]
+      { lng: 24.14285, lat: 56.98158 },
+    ],
   },
   {
     name: "Salamandra",
@@ -173,8 +177,8 @@ export const Districts = [
       { lng: 24.22599, lat: 56.99055 },
       { lng: 24.19451, lat: 56.98506 },
       { lng: 24.19079, lat: 56.99248 },
-      { lng: 24.23096, lat: 56.99876 }
-    ]
+      { lng: 24.23096, lat: 56.99876 },
+    ],
   },
   {
     name: "Jugla",
@@ -182,8 +186,8 @@ export const Districts = [
       { lng: 24.20471, lat: 56.98619 },
       { lng: 24.24983, lat: 56.99485 },
       { lng: 24.25695, lat: 56.97577 },
-      { lng: 24.22251, lat: 56.96957 }
-    ]
+      { lng: 24.22251, lat: 56.96957 },
+    ],
   },
   {
     name: "Ozolciema",
@@ -196,9 +200,19 @@ export const Districts = [
       { lng: 24.07183, lat: 56.87708 },
       { lng: 24.07801, lat: 56.89565 },
       { lng: 24.09152, lat: 56.89752 },
-      { lng: 24.1096, lat: 56.90154 }
-    ]
-  }
+      { lng: 24.1096, lat: 56.90154 },
+    ],
+  },
+  {
+    name: "Bergi",
+    points: [
+      { lng: 24.257784, lat: 57.00039 },
+      { lng: 24.314008, lat: 57.016818 },
+      { lng: 24.326949, lat: 56.969195 },
+      { lng: 24.257057, lat: 56.957573 },
+      { lng: 24.255865, lat: 56.9819 },
+    ],
+  },
 ];
 
 export const jelgavaDistrict = [
@@ -218,5 +232,5 @@ export const jelgavaDistrict = [
   { lng: 23.6185382, lat: 56.6711121 },
   { lng: 23.6339878, lat: 56.6514888 },
   { lng: 23.6353611, lat: 56.6467701 },
-  { lng: 23.6542438, lat: 56.6473364 }
+  { lng: 23.6542438, lat: 56.6473364 },
 ];

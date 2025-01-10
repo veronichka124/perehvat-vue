@@ -13,7 +13,6 @@ import "vuetify/dist/vuetify.min.css";
 
 import App from "./App.vue";
 import modal from "./components/modal-template.vue";
-import ButtonCounter from "./components/button-counter.vue";
 import timer from "./components/timer.vue";
 import MainMap from "./components/map.vue";
 import OfflineMap from "./components/offline-map.vue";
@@ -21,22 +20,21 @@ import OfflineMap from "./components/offline-map.vue";
 import "./style.css";
 
 Vue.use(VueGeolocation);
-Vue.use(VueOnsen); 
+Vue.use(VueOnsen);
 Vue.use(Vuetify);
 Vue.use(VueAxios, axios);
 Vue.use(VueGoogleMaps, {
   load: {
     key: "AIzaSyDNT2Wv0k6wG9_KdMmfsnfiqeFo6DKb8M4",
-    libraries: "geometry" // This is required if you use the Autocomplete plugin
-  }
+    libraries: "geometry", // This is required if you use the Autocomplete plugin
+  },
 });
 Vue.component("modal", modal);
-Vue.component("button-counter", ButtonCounter);
 Vue.component("timer", timer);
 Vue.component("main-map", MainMap);
 Vue.component("offline-map", OfflineMap);
 
 new Vue({
   el: "#app",
-  render: h => h(App)
+  render: (h) => h(App),
 });
